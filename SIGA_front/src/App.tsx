@@ -1,121 +1,87 @@
 import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
+import type { FormEvent } from 'react'
 import './App.css'
+import { clearSession, getStoredUser, login, type Usuario } from './services/auth'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [user, setUser] = useState<Usuario | null>(getStoredUser)
+  const [email, setEmail] = useState('admin@siga.local')
+  const [password, setPassword] = useState('Admin123!')
+  const [error, setError] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    setError('')
+    setIsLoading(true)
+    try {
+      const response = await login(email, password)
+      setUser(response.usuario)
+    } catch (requestError) {
+      setError(requestError instanceof Error ? requestError.message : 'Error inesperado.')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  function handleLogout() {
+    clearSession()
+    setUser(null)
+  }
+
+  if (user) {
+    return (
+      <main className="app-shell">
+        <header className="topbar">
+          <div className="brand compact-brand"><span className="brand-mark">S</span><span>SIGA</span></div>
+          <div className="user-menu">
+            <div><strong>{user.email}</strong><span>{user.rol}</span></div>
+            <button className="button button-secondary" type="button" onClick={handleLogout}>Cerrar sesión</button>
+          </div>
+        </header>
+        <section className="welcome-card">
+          <div className="eyebrow">Acceso confirmado</div>
+          <h1>Bienvenido a SIGA</h1>
+          <p>Tu sesión está activa. En la siguiente etapa construiremos el dashboard de inventario, lotes y distribución FEFO.</p>
+          <div className="feature-grid">
+            <article><span className="feature-icon">▦</span><h2>Inventario por lotes</h2><p>Control de existencias, ubicaciones y fechas de vencimiento.</p></article>
+            <article><span className="feature-icon">↗</span><h2>Priorización FEFO</h2><p>Distribución ordenada por el lote que vence primero.</p></article>
+            <article><span className="feature-icon">✓</span><h2>Trazabilidad</h2><p>Registro de movimientos y responsables de cada operación.</p></article>
+          </div>
+        </section>
+      </main>
+    )
+  }
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+    <main className="login-layout">
+      <section className="login-hero">
+        <div className="brand"><span className="brand-mark">S</span><span>SIGA</span></div>
+        <div className="hero-content">
+          <div className="eyebrow">Sistema de gestión de alimentos</div>
+          <h1>Menos desperdicio.<br /><em>Más impacto.</em></h1>
+          <p>Gestiona donaciones, inventario y distribución de alimentos con trazabilidad y priorización inteligente.</p>
         </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
+        <div className="hero-note">Banco de alimentos · UIS</div>
       </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
+      <section className="login-panel">
+        <div className="login-form-wrapper">
+          <div className="mobile-brand brand"><span className="brand-mark">S</span><span>SIGA</span></div>
+          <div className="eyebrow">Área segura</div>
+          <h2>Iniciar sesión</h2>
+          <p className="form-intro">Ingresa tus credenciales para continuar al sistema.</p>
+          <form onSubmit={handleSubmit} noValidate>
+            <label htmlFor="email">Correo electrónico</label>
+            <input id="email" type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="nombre@organizacion.org" required />
+            <label htmlFor="password">Contraseña</label>
+            <input id="password" type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="••••••••" required />
+            {error && <div className="error-message" role="alert">{error}</div>}
+            <button className="button button-primary submit-button" type="submit" disabled={isLoading}>{isLoading ? 'Validando…' : 'Entrar al sistema'}{!isLoading && <span aria-hidden="true">→</span>}</button>
+          </form>
+          <p className="security-note"><span aria-hidden="true">▣</span> Conexión protegida con autenticación JWT</p>
         </div>
       </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+    </main>
   )
 }
 

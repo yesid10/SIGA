@@ -1,0 +1,51 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: siga-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-siga}
+      POSTGRES_USER: ${POSTGRES_USER:-siga}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-siga}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - siga-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./SIGA_back
+    container_name: siga-backend
+    restart: unless-stopped
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-siga}
+      DB_USERNAME: ${POSTGRES_USER:-siga}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-siga}
+      JWT_SECRET: ${JWT_SECRET:-change-this-secret-in-development-minimum-32-characters}
+      JWT_EXPIRATION_MS: ${JWT_EXPIRATION_MS:-3600000}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:5173,http://localhost:8080}
+      SEED_ADMIN_EMAIL: ${SEED_ADMIN_EMAIL:-admin@siga.local}
+      SEED_ADMIN_PASSWORD: ${SEED_ADMIN_PASSWORD:-Admin123!}
+    ports:
+      - "${BACKEND_PORT:-8080}:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./SIGA_front
+    container_name: siga-frontend
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_PORT:-3000}:80"
+    depends_on:
+      - backend
+
+volumes:
+  siga-db-data:
