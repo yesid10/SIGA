@@ -77,14 +77,21 @@ El token de Firebase solo se utilizará en el intercambio inicial; no se enviar�
 
 ### Fase 2 — Estructura frontend y navegación
 
-- Crear `app/App.tsx`, `router.tsx` y `providers.tsx`.
-- Crear rutas públicas y protegidas con React Router.
-- Crear `ProtectedRoute`, `RoleGuard` y `ProfileGuard`.
-- Crear layout público, layout de autenticación y layout administrativo.
-- Crear átomos base: Button, Input, Label, Badge, Icon, Spinner y Typography.
-- Crear moléculas: FormField, PasswordField, SearchInput, AlertMessage y Pagination.
-- Crear organismos: LoginForm, RegisterForm, Navbar, Sidebar y DataTable.
-- Migrar páginas a componentes por dominio.
+- [x] Crear `Routes/App.tsx` y `Routes/AppRouter.tsx` como composición y entrada del router.
+- [x] Crear rutas públicas y protegidas con React Router.
+- [x] Crear `ProtectedRoute` y `RoleGuard`; `ProfileGuard` quedó creado para la fase de perfiles.
+- [x] Crear layout de autenticación y layout administrativo.
+- [x] Crear átomos base: Button, Input, Label, Badge, Spinner y Typography.
+- [x] Crear moléculas base: FormField y AlertMessage.
+- [x] Crear organismos iniciales: LoginForm, Navbar y Sidebar.
+- [x] Migrar login, dashboard y módulos iniciales a páginas y templates.
+- [x] Crear cliente Axios con interceptor global para el JWT propio.
+- [x] Completar organismos y moléculas restantes: RegisterForm, DataTable, PasswordField, SearchInput y Pagination.
+- [x] Integrar `authStore` de Zustand en la sesión global.
+- [x] Completar páginas iniciales de autenticación y dominios placeholder.
+- [x] Validar login y registro con Zod + React Hook Form, incluyendo mensajes por campo y selección de perfiles.
+- [x] Definir `/` como ruta pública que redirige a `/login`; no existe redirección raíz directa a dashboard.
+- [x] Usar Axios como cliente central con JWT automático y manejo global de `401`.
 
 Estructura objetivo:
 
