@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
-import './App.css'
 import { clearSession, getStoredUser, login, type Usuario } from './services/auth'
 
 function App() {

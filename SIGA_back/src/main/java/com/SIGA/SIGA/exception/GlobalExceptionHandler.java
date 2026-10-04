@@ -28,15 +28,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(respuesta);
     }
 
-    @ExceptionHandler(EstudianteNoEncontradoException.class)
-    public ResponseEntity<Map<String, Object>> manejarEstudianteNoEncontrado(EstudianteNoEncontradoException ex) {
-        Map<String, Object> respuesta = new HashMap<>();
-        respuesta.put("mensaje", ex.getMessage());
-        respuesta.put("estado", HttpStatus.NOT_FOUND.value());
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(respuesta);
-    }
-
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> manejarExcepcionGeneral(Exception ex) {
         Map<String, Object> respuesta = new HashMap<>();

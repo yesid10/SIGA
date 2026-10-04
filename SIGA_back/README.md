@@ -1,18 +1,8 @@
-# SIGA_back
+# SIGA Backend
 
-Backend desarrollado como entrega del laboratorio de la materia **Entornos de Programación**.  
-El objetivo del proyecto es implementar un **CRUD completo** sobre una única entidad: **Estudiante**.
+Backend del Sistema de Gestión de Inventario para un Banco de Alimentos con priorización FEFO.
 
-La aplicación está construida con **Spring Boot** para exponer la API REST y gestionar la lógica del negocio.  
-Para la persistencia se utiliza **PostgreSQL en la nube** mediante **NeonDB**, por lo que el backend ya está conectado a un servicio de base de datos remoto.
-
-## Funcionalidades principales
-
-- Crear estudiante
-- Consultar estudiante por cédula
-- Listar todos los estudiantes
-- Actualizar estudiante
-- Eliminar estudiante
+La aplicación está en migración desde el CRUD académico inicial hacia el dominio de donaciones, usuarios, inventario por lotes, solicitudes y distribuciones. La autenticación actual utiliza JWT propio; la siguiente fase integrará Firebase Authentication como proveedor de identidad inicial, manteniendo el JWT del backend para las peticiones normales.
 
 ## Tecnologías
 
@@ -20,69 +10,55 @@ Para la persistencia se utiliza **PostgreSQL en la nube** mediante **NeonDB**, p
 - Spring Boot
 - Spring Web MVC
 - Spring Data JPA / Hibernate
-- PostgreSQL (NeonDB)
-- OpenAPI / Swagger (springdoc)
+- PostgreSQL
+- Spring Security y JWT
+- OpenAPI / Swagger
 
-## Cómo levantar el proyecto
+## Ejecución
 
-1. Clonar el repositorio:
+Para ejecutar con Docker Compose desde la raíz del repositorio:
 
-```bash
-git clone https://github.com/yesid10/SIGA_back
-cd SIGA_back
+```text
+docker compose up --build
 ```
 
-2. Crear un archivo `.env` en la raíz del proyecto (puedes copiar `.env.example`) y definir:
-   - `DB_URL`
-   - `DB_USERNAME`
-   - `DB_PASSWORD`
-3. Exportar las variables del `.env` en tu terminal antes de ejecutar la app:
+Para ejecutar el backend directamente, define estas variables en `.env` o en el entorno:
 
-```bash
-set -a && source .env && set +a
-```
+- `DB_URL`
+- `DB_USERNAME`
+- `DB_PASSWORD`
+- `JWT_SECRET`
+- `JWT_EXPIRATION_MS`
+- `CORS_ALLOWED_ORIGINS`
+- `SEED_ADMIN_EMAIL`
+- `SEED_ADMIN_PASSWORD`
 
-   Si usas **IntelliJ IDEA**, una forma más cómoda es instalar el plugin **EnvFile** y enlazar el archivo `.env` desde la configuración de ejecución. Esto evita tener que exportar las variables manualmente cada vez que levantas el proyecto.
+Después ejecuta el Maven Wrapper:
 
-   En **Windows**, si no usas IntelliJ, puedes abrir la terminal de PowerShell dentro del proyecto y cargar las variables con un script equivalente, o definirlas directamente en la configuración de ejecución del IDE. Si prefieres trabajar desde consola, también puedes adaptar el `.env` a tu entorno y usar el comando de arranque de Maven correspondiente.
-
-   Si usas **otro IDE** distinto a IntelliJ, busca la opción equivalente para cargar variables de entorno en la configuración de ejecución. La idea es la misma: `DB_URL`, `DB_USERNAME` y `DB_PASSWORD` deben estar disponibles para el proceso que inicia Spring Boot.
-
-4. Ejecutar la aplicación con Maven Wrapper:
-
-```bash
+```text
 ./mvnw spring-boot:run
 ```
 
-Si estás en Windows:
+La API queda disponible en `http://localhost:8080`.
 
-```bash
-mvnw.cmd spring-boot:run
-```
+## Autenticación actual
 
-Por defecto, la app levanta en:
+Endpoint público disponible:
 
-- `http://localhost:8080`
+- `POST /api/v1/auth/login`
 
-## Endpoints principales
+Credenciales locales de desarrollo:
 
-Base path de la API:
+- Correo: `admin@siga.local`
+- Contraseña: `Admin123!`
 
-- `/api/v1/estudiantes`
+El resto de endpoints requiere el encabezado `Authorization: Bearer <jwt>`.
 
-Operaciones:
+La integración Firebase → JWT propio se implementará en la Fase 3 del plan raíz del repositorio.
 
-- `POST /api/v1/estudiantes` → crear estudiante
-- `GET /api/v1/estudiantes` → listar estudiantes
-- `GET /api/v1/estudiantes/{cedula}` → consultar por cédula
-- `PUT /api/v1/estudiantes/{cedula}` → actualizar estudiante
-- `DELETE /api/v1/estudiantes/{cedula}` → eliminar estudiante
+## Documentación
 
-## Documentación Swagger / OpenAPI
+- Swagger UI: `http://localhost:8080/swagger-ui.html`
+- OpenAPI JSON: `http://localhost:8080/v3/api-docs`
 
-Con la aplicación en ejecución, puedes acceder a:
-
-- **Swagger UI:** `http://localhost:8080/swagger-ui.html`
-- **OpenAPI JSON:** `http://localhost:8080/v3/api-docs`
-
-Desde Swagger UI puedes probar los endpoints directamente (requests y responses) sin usar herramientas externas.
+El diseño de entidades, DTOs, perfiles, roles, donaciones e inventario está documentado en `/plan.md`.
