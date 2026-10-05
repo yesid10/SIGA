@@ -28,8 +28,14 @@ public class Usuario {
     @Column(nullable = false, unique = true, length = 120)
     private String email;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String password;
+
+    @Column(name = "firebase_uid", unique = true, length = 128)
+    private String firebaseUid;
+
+    @Column(length = 160)
+    private String nombre;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)

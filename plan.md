@@ -116,18 +116,21 @@ src/
 
 ### Fase 3 — Firebase + JWT propio
 
-- Configurar Firebase Web mediante variables `VITE_FIREBASE_*`.
-- Configurar Firebase Admin SDK en backend mediante variables/credencial fuera de Git.
-- Implementar registro con correo y contraseña.
-- Enviar correo de verificación.
-- Implementar login con correo y contraseña.
-- Implementar login/registro con Google.
-- Rechazar usuarios con correo no verificado.
-- Crear/actualizar usuario local por Firebase UID.
-- Persistir perfiles y roles en PostgreSQL.
-- Emitir JWT propio después de validar Firebase.
-- Crear Zustand `authStore` para usuario, JWT, login, logout y restauración.
-- Crear Axios centralizado con interceptor de request:
+- [x] Configurar Firebase Web mediante variables `VITE_FIREBASE_*` y archivo `.env.example`.
+- [x] Configurar Firebase Admin SDK opcional en backend mediante variables fuera de Git.
+- [x] Crear endpoint `POST /api/v1/auth/firebase` para intercambio.
+- [x] Implementar registro Firebase con correo y contraseña y envío de verificación.
+- [x] Implementar login Firebase con correo y contraseña.
+- [x] Implementar login Firebase con Google.
+- [x] Rechazar usuarios cuyo correo no esté verificado antes de intercambiar el token.
+- [x] Crear/actualizar usuario local por Firebase UID.
+- [x] Asignar `BENEFICIARIO` por defecto a usuarios Firebase nuevos.
+- [x] Emitir JWT propio después de validar Firebase.
+- [x] Mantener el login local JWT actual durante la transición.
+- [ ] Persistir perfiles múltiples (`DONADOR`/`BENEFICIARIO`) en PostgreSQL; requiere ampliar el modelo actual de rol único.
+- [ ] Configurar las credenciales reales del proyecto Firebase en `.env` local.
+- [x] Mantener Zustand `authStore` para usuario, JWT, logout y restauración.
+- [x] Mantener Axios centralizado con interceptor de request:
   - Leer JWT del store/persistencia.
   - Agregar `Authorization: Bearer <jwt>` automáticamente.
   - Excluir endpoints públicos.

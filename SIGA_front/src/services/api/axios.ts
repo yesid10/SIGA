@@ -1,5 +1,11 @@
 import axios from 'axios'
 
+declare module 'axios' {
+  interface AxiosRequestConfig {
+    skipAuth?: boolean
+  }
+}
+
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_URL ?? '/api',
   headers: { 'Content-Type': 'application/json' },
@@ -7,7 +13,7 @@ const apiClient = axios.create({
 
 apiClient.interceptors.request.use((config) => {
   const token = localStorage.getItem('siga_token')
-  if (token) config.headers.Authorization = `Bearer ${token}`
+  if (token && !config.skipAuth) config.headers.Authorization = `Bearer ${token}`
   return config
 })
 

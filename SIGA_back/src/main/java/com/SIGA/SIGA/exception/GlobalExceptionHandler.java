@@ -28,6 +28,22 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(respuesta);
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Map<String, Object>> manejarArgumentoInvalido(IllegalArgumentException ex) {
+        Map<String, Object> respuesta = new HashMap<>();
+        respuesta.put("mensaje", ex.getMessage());
+        respuesta.put("estado", HttpStatus.UNAUTHORIZED.value());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(respuesta);
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<Map<String, Object>> manejarServicioNoConfigurado(IllegalStateException ex) {
+        Map<String, Object> respuesta = new HashMap<>();
+        respuesta.put("mensaje", ex.getMessage());
+        respuesta.put("estado", HttpStatus.SERVICE_UNAVAILABLE.value());
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(respuesta);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> manejarExcepcionGeneral(Exception ex) {
         Map<String, Object> respuesta = new HashMap<>();
