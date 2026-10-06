@@ -26,7 +26,7 @@ const registerSchema = z
 type RegisterFormValues = z.infer<typeof registerSchema>;
 type RegisterFormProps = { onSuccess: (user: Usuario) => void };
 
-export function RegisterForm({ onSuccess }: RegisterFormProps) {
+export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
   const {
     register,
     handleSubmit,
@@ -37,7 +37,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
     defaultValues: { name: "", email: "", password: "", confirmPassword: "" },
   });
 
-  async function onSubmit(values: RegisterFormValues) {
+  const onSubmit = async (values: RegisterFormValues) => {
     try {
       const response = await registerUser({
         nombre: values.name,
@@ -53,7 +53,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
             : "No fue posible crear la cuenta.",
       });
     }
-  }
+  };
 
   return (
     <form className="grid gap-4" onSubmit={handleSubmit(onSubmit)} noValidate>

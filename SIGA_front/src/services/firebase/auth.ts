@@ -4,7 +4,7 @@ import apiClient from '../api/axios'
 import { getFirebaseAuth } from './firebase'
 import type { LoginResponse } from '../../services/auth'
 
-function getFirebaseErrorMessage(error: unknown): string {
+const getFirebaseErrorMessage = (error: unknown): string => {
   if (axios.isAxiosError(error)) {
     const backendMessage = error.response?.data?.mensaje
     if (typeof backendMessage === 'string' && backendMessage.length > 0) return backendMessage
@@ -27,7 +27,7 @@ function getFirebaseErrorMessage(error: unknown): string {
   }
 }
 
-async function exchangeToken(): Promise<LoginResponse> {
+const exchangeToken = async (): Promise<LoginResponse> => {
   const auth = getFirebaseAuth()
   if (!auth.currentUser) throw new Error('No hay un usuario Firebase autenticado.')
   if (!auth.currentUser.emailVerified) throw new Error('Verifica tu correo antes de ingresar.')
@@ -39,7 +39,7 @@ async function exchangeToken(): Promise<LoginResponse> {
   return data
 }
 
-export async function loginWithGoogle(): Promise<LoginResponse> {
+export const loginWithGoogle = async (): Promise<LoginResponse> => {
   const auth = getFirebaseAuth()
   try {
     await signInWithPopup(auth, new GoogleAuthProvider())

@@ -12,7 +12,7 @@ const variants: Record<ButtonVariant, string> = {
   ghost: 'text-slate-600 hover:bg-slate-100 focus-visible:ring-slate-500',
 }
 
-export function Button({ variant = 'primary', className = '', ...props }: ButtonProps) {
+export const Button = ({ variant = 'primary', className = '', ...props }: ButtonProps) => {
   return (
     <button
       className={`inline-flex items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-bold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 ${variants[variant]} ${className}`}

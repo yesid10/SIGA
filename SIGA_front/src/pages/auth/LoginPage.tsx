@@ -6,12 +6,12 @@ import type { Usuario } from "../../services/auth";
 
 type LoginPageProps = { onLogin: (user: Usuario) => void };
 
-export function LoginPage({ onLogin }: LoginPageProps) {
+export const LoginPage = ({ onLogin }: LoginPageProps) => {
   const navigate = useNavigate();
-  function handleSuccess(user: Usuario) {
+  const handleSuccess = (user: Usuario) => {
     onLogin(user);
     navigate("/dashboard", { replace: true });
-  }
+  };
 
   return (
     <AuthTemplate>

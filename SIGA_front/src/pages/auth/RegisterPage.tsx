@@ -6,14 +6,14 @@ import { RegisterForm } from "../../components/organisms/RegisterForm";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../stores/authStore";
 
-export function RegisterPage() {
+export const RegisterPage = () => {
   const navigate = useNavigate();
   const setUser = useAuthStore((state) => state.setUser);
 
-  function handleSuccess(user: Parameters<typeof setUser>[0]) {
+  const handleSuccess = (user: Parameters<typeof setUser>[0]) => {
     setUser(user);
     navigate("/dashboard", { replace: true });
-  }
+  };
 
   return (
     <AuthTemplate>

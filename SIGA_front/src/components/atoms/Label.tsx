@@ -1,5 +1,5 @@
 import type { LabelHTMLAttributes } from 'react'
 
-export function Label({ className = '', ...props }: LabelHTMLAttributes<HTMLLabelElement>) {
+export const Label = ({ className = '', ...props }: LabelHTMLAttributes<HTMLLabelElement>) => {
   return <label className={`text-sm font-bold text-slate-800 ${className}`} {...props} />
 }

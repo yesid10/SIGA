@@ -2,12 +2,15 @@ import { NavLink } from 'react-router-dom'
 
 const links = [
   { to: '/dashboard', label: 'Dashboard' },
-  { to: '/inventory', label: 'Inventario' },
+  { to: '/products', label: 'Productos' },
+  { to: '/locations', label: 'Ubicaciones' },
+  { to: '/donors', label: 'Donantes' },
   { to: '/donations', label: 'Donaciones' },
+  { to: '/inventory', label: 'Inventario' },
   { to: '/requests', label: 'Solicitudes' },
 ]
 
-export function Sidebar() {
+export const Sidebar = () => {
   return (
     <aside className="border-b border-slate-200 bg-white lg:min-h-[calc(100vh-73px)] lg:w-60 lg:border-b-0 lg:border-r">
       <nav className="flex gap-1 overflow-x-auto p-3 lg:grid lg:content-start lg:gap-2 lg:p-5">

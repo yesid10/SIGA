@@ -36,6 +36,22 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(respuesta);
     }
 
+    @ExceptionHandler(ReglaNegocioException.class)
+    public ResponseEntity<Map<String, Object>> manejarReglaNegocio(ReglaNegocioException ex) {
+        Map<String, Object> respuesta = new HashMap<>();
+        respuesta.put("mensaje", ex.getMessage());
+        respuesta.put("estado", HttpStatus.BAD_REQUEST.value());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(respuesta);
+    }
+
+    @ExceptionHandler(RecursoNoEncontradoException.class)
+    public ResponseEntity<Map<String, Object>> manejarRecursoNoEncontrado(RecursoNoEncontradoException ex) {
+        Map<String, Object> respuesta = new HashMap<>();
+        respuesta.put("mensaje", ex.getMessage());
+        respuesta.put("estado", HttpStatus.NOT_FOUND.value());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(respuesta);
+    }
+
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, Object>> manejarArgumentoInvalido(IllegalArgumentException ex) {
         Map<String, Object> respuesta = new HashMap<>();

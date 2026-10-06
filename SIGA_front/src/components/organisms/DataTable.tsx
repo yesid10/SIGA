@@ -6,11 +6,11 @@ type DataTableProps = {
   emptyMessage?: string;
 };
 
-export function DataTable({
+export const DataTable = ({
   headers,
   children,
   emptyMessage = "No hay registros para mostrar.",
-}: DataTableProps) {
+}: DataTableProps) => {
   return (
     <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
       <table className="w-full min-w-155 text-left text-sm">
@@ -38,4 +38,4 @@ export function DataTable({
       </table>
     </div>
   );
-}
+};

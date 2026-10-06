@@ -7,8 +7,11 @@ import { LoginPage } from "../pages/auth/LoginPage";
 import { RegisterPage } from "../pages/auth/RegisterPage";
 import { DashboardPage } from "../pages/dashboard/DashboardPage";
 import { PlaceholderPage } from "../pages/PlaceholderPage";
+import { ProductsPage } from "../pages/products/ProductsPage";
+import { LocationsPage } from "../pages/locations/LocationsPage";
+import { DonorsPage } from "../pages/donors/DonorsPage";
 
-export default function AppRouter() {
+export const AppRouter = () => {
   const user = useAuthStore((state) => state.user);
   const setUser = useAuthStore((state) => state.setUser);
   const handleLogout = useAuthStore((state) => state.logout);
@@ -41,6 +44,30 @@ export default function AppRouter() {
               </DashboardTemplate>
             }
             path="/dashboard"
+          />
+          <Route
+            element={
+              <DashboardTemplate user={user!} onLogout={handleLogout}>
+                <ProductsPage />
+              </DashboardTemplate>
+            }
+            path="/products"
+          />
+          <Route
+            element={
+              <DashboardTemplate user={user!} onLogout={handleLogout}>
+                <LocationsPage />
+              </DashboardTemplate>
+            }
+            path="/locations"
+          />
+          <Route
+            element={
+              <DashboardTemplate user={user!} onLogout={handleLogout}>
+                <DonorsPage />
+              </DashboardTemplate>
+            }
+            path="/donors"
           />
           <Route
             element={
@@ -98,4 +125,6 @@ export default function AppRouter() {
       </Routes>
     </BrowserRouter>
   );
-}
+};
+
+export default AppRouter;

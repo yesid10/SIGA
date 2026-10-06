@@ -26,7 +26,7 @@ export interface LoginResponse {
 const TOKEN_KEY = 'siga_token'
 const USER_KEY = 'siga_usuario'
 
-function extraerMensajeError(error: unknown, fallback: string): string {
+const extraerMensajeError = (error: unknown, fallback: string): string => {
   if (axios.isAxiosError(error)) {
     const data = error.response?.data
     if (data && typeof data === 'object') {
@@ -50,7 +50,7 @@ function extraerMensajeError(error: unknown, fallback: string): string {
   return error instanceof Error ? error.message : fallback
 }
 
-export async function login(email: string, password: string): Promise<LoginResponse> {
+export const login = async (email: string, password: string): Promise<LoginResponse> => {
   try {
     const { data } = await apiClient.post<LoginResponse>('/v1/auth/login', { email, password }, { skipAuth: true })
     localStorage.setItem(TOKEN_KEY, data.token)
@@ -61,7 +61,7 @@ export async function login(email: string, password: string): Promise<LoginRespo
   }
 }
 
-export async function register(request: RegisterRequest): Promise<LoginResponse> {
+export const register = async (request: RegisterRequest): Promise<LoginResponse> => {
   try {
     const { data } = await apiClient.post<LoginResponse>('/v1/auth/register', request, { skipAuth: true })
     localStorage.setItem(TOKEN_KEY, data.token)
@@ -72,7 +72,7 @@ export async function register(request: RegisterRequest): Promise<LoginResponse>
   }
 }
 
-export function getStoredUser(): Usuario | null {
+export const getStoredUser = (): Usuario | null => {
   if (!localStorage.getItem(TOKEN_KEY)) {
     localStorage.removeItem(USER_KEY)
     return null
@@ -89,7 +89,7 @@ export function getStoredUser(): Usuario | null {
   }
 }
 
-export function clearSession(): void {
+export const clearSession = (): void => {
   localStorage.removeItem(TOKEN_KEY)
   localStorage.removeItem(USER_KEY)
 }

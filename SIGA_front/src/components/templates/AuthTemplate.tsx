@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 
 type AuthTemplateProps = { children: ReactNode };
 
-export function AuthTemplate({ children }: AuthTemplateProps) {
+export const AuthTemplate = ({ children }: AuthTemplateProps) => {
   return (
     <main className="grid min-h-screen bg-[#f7f8f3] lg:grid-cols-[1.08fr_.92fr]">
       <section className="relative hidden overflow-hidden bg-emerald-950 p-12 text-white lg:flex lg:flex-col lg:justify-between lg:px-[clamp(48px,7vw,112px)]">

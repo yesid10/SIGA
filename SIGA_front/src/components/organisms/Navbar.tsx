@@ -4,7 +4,7 @@ import { Button } from '../atoms/Button'
 
 type NavbarProps = { user: Usuario; onLogout: () => void }
 
-export function Navbar({ user, onLogout }: NavbarProps) {
+export const Navbar = ({ user, onLogout }: NavbarProps) => {
   return (
     <header className="border-b border-slate-200 bg-white">
       <div className="mx-auto flex min-h-18 max-w-7xl items-center justify-between gap-4 px-5 py-3 lg:px-8">

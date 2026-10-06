@@ -21,7 +21,7 @@ const loginSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>;
 type LoginFormProps = { onSuccess: (user: Usuario) => void };
 
-export function LoginForm({ onSuccess }: LoginFormProps) {
+export const LoginForm = ({ onSuccess }: LoginFormProps) => {
   const {
     register,
     handleSubmit,
@@ -32,7 +32,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
     defaultValues: { email: "", password: "" },
   });
 
-  async function onSubmit(values: LoginFormValues) {
+  const onSubmit = async (values: LoginFormValues) => {
     try {
       const response = await login(values.email, values.password);
       onSuccess(response.usuario);
@@ -44,9 +44,9 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
             : "No fue posible iniciar sesión.",
       });
     }
-  }
+  };
 
-  async function handleGoogleLogin() {
+  const handleGoogleLogin = async () => {
     try {
       const response = await loginWithGoogle();
       onSuccess(response.usuario);
@@ -58,7 +58,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
             : "No fue posible ingresar con Google.",
       });
     }
-  }
+  };
 
   return (
     <form className="grid gap-4" onSubmit={handleSubmit(onSubmit)} noValidate>

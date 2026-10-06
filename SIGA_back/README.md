@@ -43,18 +43,18 @@ La API queda disponible en `http://localhost:8080`.
 
 ## Autenticación actual
 
-Endpoint público disponible:
+Endpoints públicos disponibles:
 
-- `POST /api/v1/auth/login`
+- `POST /api/v1/auth/register` (registro directo en base de datos con rol BENEFICIARIO)
+- `POST /api/v1/auth/login` (inicio de sesión con correo y contraseña locales)
+- `POST /api/v1/auth/firebase` (intercambio de ID Token de Google/Firebase por JWT interno)
 
-Credenciales locales de desarrollo:
+Credenciales locales iniciales (semilla):
 
 - Correo: `admin@siga.local`
 - Contraseña: `Admin123!`
 
-El resto de endpoints requiere el encabezado `Authorization: Bearer <jwt>`.
-
-La integración Firebase → JWT propio se implementará en la Fase 3 del plan raíz del repositorio.
+El resto de endpoints del sistema requiere el encabezado `Authorization: Bearer <jwt>`.
 
 ## Documentación
 

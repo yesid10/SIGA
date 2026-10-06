@@ -10,7 +10,7 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
 }
 
-export function getFirebaseAuth() {
+export const getFirebaseAuth = () => {
   if (!firebaseConfig.apiKey || !firebaseConfig.authDomain || !firebaseConfig.projectId || !firebaseConfig.appId) {
     throw new Error('Faltan las variables VITE_FIREBASE_* del frontend.')
   }
