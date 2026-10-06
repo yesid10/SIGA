@@ -22,7 +22,7 @@ public class UsuarioDetailsService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("Credenciales inválidas"));
 
         return User.withUsername(usuario.getEmail())
-                .password(usuario.getPassword())
+                .password(usuario.getPassword() == null ? "" : usuario.getPassword())
                 .authorities(new SimpleGrantedAuthority("ROLE_" + usuario.getRol().name()))
                 .disabled(!usuario.isActivo())
                 .build();
