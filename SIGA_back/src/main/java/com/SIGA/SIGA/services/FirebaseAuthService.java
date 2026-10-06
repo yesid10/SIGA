@@ -59,10 +59,14 @@ public class FirebaseAuthService {
             if (exception instanceof FirebaseAuthException firebaseException) {
                 logger.warn("Firebase rechazó el ID Token. Código: {}, mensaje: {}",
                         firebaseException.getErrorCode(), firebaseException.getMessage(), firebaseException);
+                throw new IllegalArgumentException("Firebase ID Token inválido o no verificable", exception);
+            } else if (exception instanceof IllegalArgumentException) {
+                logger.warn("El usuario Firebase no puede iniciar sesión: {}", exception.getMessage());
+                throw (IllegalArgumentException) exception;
             } else {
                 logger.warn("No fue posible intercambiar el Firebase ID Token: {}", exception.getMessage(), exception);
+                throw new IllegalArgumentException("Firebase ID Token inválido o no verificable", exception);
             }
-            throw new IllegalArgumentException("Firebase ID Token inválido o no verificable", exception);
         }
     }
 }

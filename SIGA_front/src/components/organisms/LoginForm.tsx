@@ -1,11 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import {
-  loginWithFirebase,
-  loginWithGoogle,
-} from "../../services/firebase/auth";
-import type { Usuario } from "../../services/auth";
+import { loginWithGoogle } from "../../services/firebase/auth";
+import { login, type Usuario } from "../../services/auth";
 import { Button } from "../atoms/Button";
 import { Input } from "../atoms/Input";
 import { Spinner } from "../atoms/Spinner";
@@ -37,7 +34,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
 
   async function onSubmit(values: LoginFormValues) {
     try {
-      const response = await loginWithFirebase(values.email, values.password);
+      const response = await login(values.email, values.password);
       onSuccess(response.usuario);
     } catch (requestError) {
       setError("root", {
