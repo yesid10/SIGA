@@ -1,4 +1,7 @@
-package com.SIGA.SIGA.model;
+package com.SIGA.SIGA.dto;
+
+import com.SIGA.SIGA.model.TipoUbicacion;
+import com.SIGA.SIGA.model.Ubicacion;
 
 public record UbicacionResponse(
         Long id,

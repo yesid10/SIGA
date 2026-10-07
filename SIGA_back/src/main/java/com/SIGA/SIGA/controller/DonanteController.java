@@ -1,7 +1,7 @@
 package com.SIGA.SIGA.controller;
 
-import com.SIGA.SIGA.model.DonanteRequest;
-import com.SIGA.SIGA.model.DonanteResponse;
+import com.SIGA.SIGA.dto.DonanteRequest;
+import com.SIGA.SIGA.dto.DonanteResponse;
 import com.SIGA.SIGA.services.DonanteService;
 import jakarta.validation.Valid;
 import java.util.List;

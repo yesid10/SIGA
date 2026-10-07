@@ -1,7 +1,7 @@
 package com.SIGA.SIGA.controller;
 
-import com.SIGA.SIGA.model.ProductoRequest;
-import com.SIGA.SIGA.model.ProductoResponse;
+import com.SIGA.SIGA.dto.ProductoRequest;
+import com.SIGA.SIGA.dto.ProductoResponse;
 import com.SIGA.SIGA.services.ProductoService;
 import jakarta.validation.Valid;
 import java.util.List;

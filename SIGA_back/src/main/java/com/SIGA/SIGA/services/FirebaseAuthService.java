@@ -1,9 +1,9 @@
 package com.SIGA.SIGA.services;
 
-import com.SIGA.SIGA.model.LoginResponse;
+import com.SIGA.SIGA.dto.LoginResponse;
+import com.SIGA.SIGA.dto.UsuarioResponse;
 import com.SIGA.SIGA.model.Rol;
 import com.SIGA.SIGA.model.Usuario;
-import com.SIGA.SIGA.model.UsuarioResponse;
 import com.SIGA.SIGA.repository.UsuarioRepository;
 import com.SIGA.SIGA.security.JwtService;
 import com.google.firebase.auth.FirebaseAuth;

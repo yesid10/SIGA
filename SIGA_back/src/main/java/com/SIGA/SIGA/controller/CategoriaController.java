@@ -1,7 +1,7 @@
 package com.SIGA.SIGA.controller;
 
-import com.SIGA.SIGA.model.CategoriaRequest;
-import com.SIGA.SIGA.model.CategoriaResponse;
+import com.SIGA.SIGA.dto.CategoriaRequest;
+import com.SIGA.SIGA.dto.CategoriaResponse;
 import com.SIGA.SIGA.services.CategoriaService;
 import jakarta.validation.Valid;
 import java.util.List;

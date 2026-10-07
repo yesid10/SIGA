@@ -1,4 +1,4 @@
-package com.SIGA.SIGA.model;
+package com.SIGA.SIGA.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

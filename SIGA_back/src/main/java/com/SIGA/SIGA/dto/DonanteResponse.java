@@ -1,4 +1,7 @@
-package com.SIGA.SIGA.model;
+package com.SIGA.SIGA.dto;
+
+import com.SIGA.SIGA.model.Donante;
+import com.SIGA.SIGA.model.TipoDonante;
 
 public record DonanteResponse(
         Long id,

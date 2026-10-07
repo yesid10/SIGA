@@ -36,7 +36,9 @@ export const AppRouter = () => {
             user ? <Navigate to="/dashboard" replace /> : <RegisterPage />
           }
         />
+
         <Route element={<ProtectedRoute user={user} />}>
+          {/* Rutas compartidas para todos los usuarios autenticados */}
           <Route
             element={
               <DashboardTemplate user={user!} onLogout={handleLogout}>
@@ -56,44 +58,6 @@ export const AppRouter = () => {
           <Route
             element={
               <DashboardTemplate user={user!} onLogout={handleLogout}>
-                <LocationsPage />
-              </DashboardTemplate>
-            }
-            path="/locations"
-          />
-          <Route
-            element={
-              <DashboardTemplate user={user!} onLogout={handleLogout}>
-                <DonorsPage />
-              </DashboardTemplate>
-            }
-            path="/donors"
-          />
-          <Route
-            element={
-              <DashboardTemplate user={user!} onLogout={handleLogout}>
-                <PlaceholderPage
-                  title="Inventario"
-                  description="Consulta productos, lotes, existencias y fechas de vencimiento."
-                />
-              </DashboardTemplate>
-            }
-            path="/inventory"
-          />
-          <Route
-            element={
-              <DashboardTemplate user={user!} onLogout={handleLogout}>
-                <PlaceholderPage
-                  title="Donaciones"
-                  description="Gestiona las propuestas de donación y su recepción."
-                />
-              </DashboardTemplate>
-            }
-            path="/donations"
-          />
-          <Route
-            element={
-              <DashboardTemplate user={user!} onLogout={handleLogout}>
                 <PlaceholderPage
                   title="Solicitudes"
                   description="Consulta y gestiona solicitudes de alimentos."
@@ -102,6 +66,57 @@ export const AppRouter = () => {
             }
             path="/requests"
           />
+
+          {/* Rutas operativas: solo para Administradores y Encargados */}
+          <Route
+            element={
+              <RoleGuard
+                user={user}
+                allowedRoles={["ADMINISTRADOR", "ENCARGADO"]}
+              />
+            }
+          >
+            <Route
+              element={
+                <DashboardTemplate user={user!} onLogout={handleLogout}>
+                  <LocationsPage />
+                </DashboardTemplate>
+              }
+              path="/locations"
+            />
+            <Route
+              element={
+                <DashboardTemplate user={user!} onLogout={handleLogout}>
+                  <DonorsPage />
+                </DashboardTemplate>
+              }
+              path="/donors"
+            />
+            <Route
+              element={
+                <DashboardTemplate user={user!} onLogout={handleLogout}>
+                  <PlaceholderPage
+                    title="Inventario por Lotes"
+                    description="Consulta de productos, lotes, existencias y fechas de vencimiento."
+                  />
+                </DashboardTemplate>
+              }
+              path="/inventory"
+            />
+            <Route
+              element={
+                <DashboardTemplate user={user!} onLogout={handleLogout}>
+                  <PlaceholderPage
+                    title="Donaciones"
+                    description="Gestión y recepción de donaciones para el ingreso al almacén."
+                  />
+                </DashboardTemplate>
+              }
+              path="/donations"
+            />
+          </Route>
+
+          {/* Rutas exclusivas del Administrador */}
           <Route
             element={<RoleGuard user={user} allowedRoles={["ADMINISTRADOR"]} />}
           >
@@ -109,8 +124,8 @@ export const AppRouter = () => {
               element={
                 <DashboardTemplate user={user!} onLogout={handleLogout}>
                   <PlaceholderPage
-                    title="Usuarios"
-                    description="La administración de usuarios y roles estará disponible próximamente."
+                    title="Usuarios y Roles"
+                    description="Administración de cuentas, colaboradores y asignación de roles."
                   />
                 </DashboardTemplate>
               }
@@ -118,6 +133,7 @@ export const AppRouter = () => {
             />
           </Route>
         </Route>
+
         <Route
           path="*"
           element={<Navigate to={user ? "/dashboard" : "/login"} replace />}

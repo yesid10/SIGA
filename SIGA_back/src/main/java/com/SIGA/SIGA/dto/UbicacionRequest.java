@@ -1,5 +1,6 @@
-package com.SIGA.SIGA.model;
+package com.SIGA.SIGA.dto;
 
+import com.SIGA.SIGA.model.TipoUbicacion;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;

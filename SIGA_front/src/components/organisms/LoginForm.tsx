@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { loginWithGoogle } from "../../services/firebase/auth";
 import { login, type Usuario } from "../../services/auth";
+import { FcGoogle } from "react-icons/fc";
 import { Button } from "../atoms/Button";
 import { Input } from "../atoms/Input";
 import { Spinner } from "../atoms/Spinner";
@@ -113,13 +114,14 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
         <span className="h-px flex-1 bg-slate-200" />
       </div>
       <Button
-        className="w-full"
+        className="flex w-full items-center justify-center gap-2"
         type="button"
         variant="secondary"
         disabled={isSubmitting}
         onClick={() => void handleGoogleLogin()}
       >
-        Continuar con Google
+        <FcGoogle className="size-5 shrink-0" />
+        <span>Continuar con Google</span>
       </Button>
     </form>
   );

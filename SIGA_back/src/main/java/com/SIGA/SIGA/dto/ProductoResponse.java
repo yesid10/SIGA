@@ -1,4 +1,6 @@
-package com.SIGA.SIGA.model;
+package com.SIGA.SIGA.dto;
+
+import com.SIGA.SIGA.model.Producto;
 
 public record ProductoResponse(
         Long id,

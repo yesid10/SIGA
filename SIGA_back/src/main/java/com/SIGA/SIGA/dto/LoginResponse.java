@@ -1,4 +1,4 @@
-package com.SIGA.SIGA.model;
+package com.SIGA.SIGA.dto;
 
 public record LoginResponse(
         String token,

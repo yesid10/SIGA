@@ -1,9 +1,9 @@
 package com.SIGA.SIGA.controller;
 
-import com.SIGA.SIGA.model.LoginRequest;
-import com.SIGA.SIGA.model.LoginResponse;
-import com.SIGA.SIGA.model.RegisterRequest;
-import com.SIGA.SIGA.model.FirebaseAuthRequest;
+import com.SIGA.SIGA.dto.FirebaseAuthRequest;
+import com.SIGA.SIGA.dto.LoginRequest;
+import com.SIGA.SIGA.dto.LoginResponse;
+import com.SIGA.SIGA.dto.RegisterRequest;
 import com.SIGA.SIGA.services.AuthService;
 import com.SIGA.SIGA.services.FirebaseAuthService;
 import jakarta.validation.Valid;
