@@ -3,6 +3,7 @@ import {
   LuLayoutDashboard,
   LuUsers,
   LuBox,
+  LuTags,
   LuMapPin,
   LuHeartHandshake,
   LuTruck,
@@ -38,6 +39,12 @@ const navItems: NavItem[] = [
     label: 'Productos',
     roles: ['ADMINISTRADOR', 'ENCARGADO', 'BENEFICIARIO'],
     icon: LuBox,
+  },
+  {
+    to: '/categories',
+    label: 'Categorías',
+    roles: ['ADMINISTRADOR', 'ENCARGADO'],
+    icon: LuTags,
   },
   {
     to: '/locations',
