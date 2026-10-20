@@ -68,3 +68,105 @@ export interface ProductoRequest {
   esPerecedero: boolean;
   unidadMedida: string;
 }
+
+export type EstadoDonacion = 'RECIBIDA' | 'CANCELADA';
+export type EstadoLote = 'DISPONIBLE' | 'PROXIMO_A_VENCER' | 'VENCIDO' | 'AGOTADO';
+
+export interface LoteItemRequest {
+  productoId: number;
+  numeroLote: string;
+  cantidad: number;
+  unidadMedida: string;
+  fechaVencimiento: string;
+  ubicacionId?: number;
+}
+
+export interface DonacionRequest {
+  donanteId: number;
+  fechaRecepcion: string;
+  observaciones?: string;
+  items: LoteItemRequest[];
+}
+
+export interface Lote {
+  id: number;
+  numeroLote: string;
+  productoId: number;
+  productoNombre: string;
+  categoriaNombre?: string;
+  esPerecedero: boolean;
+  cantidadInicial: number;
+  cantidadDisponible: number;
+  unidadMedida: string;
+  fechaIngreso: string;
+  fechaVencimiento: string;
+  diasRestantes?: number;
+  estado: EstadoLote;
+  ubicacionId?: number | null;
+  ubicacionCodigo?: string | null;
+  ubicacionNombre?: string | null;
+  donanteId?: number | null;
+  donanteNombre?: string | null;
+}
+
+export interface Donacion {
+  id: number;
+  donanteId: number;
+  donanteNombre: string;
+  donanteIdentificacion: string;
+  usuarioResponsableEmail?: string | null;
+  fechaRecepcion: string;
+  observaciones?: string | null;
+  estado: EstadoDonacion;
+  items: Lote[];
+  totalProductos: number;
+  totalCantidad: number;
+  createdAt: string;
+}
+
+export interface CategoriaEstadistica {
+  categoria: string;
+  cantidad: number;
+  porcentaje: number;
+}
+
+export interface EstadoLotesEstadistica {
+  disponibles: number;
+  proximosAVencer: number;
+  vencidos: number;
+}
+
+export interface AlertaResumen {
+  loteId: number;
+  numeroLote: string;
+  productoNombre: string;
+  fechaVencimiento: string;
+  diasRestantes: number;
+  urgencia: string;
+}
+
+export interface DonacionPorTipoEstadistica {
+  tipo: string;
+  cantidad: number;
+}
+
+export interface LotesPorTiempoEstadistica {
+  masDe3Meses: number;
+  unoATresMeses: number;
+  treintaDiasOMenos: number;
+  vencidos: number;
+}
+
+export interface InventarioMetricasResponse {
+  productosDisponibles: number;
+  lotesRegistrados: number;
+  proximosAVencer: number;
+  donacionesRegistradas: number;
+  alertasVencimiento: number;
+  productosPorCategoria: CategoriaEstadistica[];
+  estadoLotes: EstadoLotesEstadistica;
+  donacionesPorTipo: DonacionPorTipoEstadistica[];
+  lotesPorTiempo: LotesPorTiempoEstadistica;
+  ultimasDonaciones: Donacion[];
+  alertasRecientes: AlertaResumen[];
+}

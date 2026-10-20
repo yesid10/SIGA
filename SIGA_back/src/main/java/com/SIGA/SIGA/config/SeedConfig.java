@@ -1,5 +1,9 @@
 package com.SIGA.SIGA.config;
 
+import com.SIGA.SIGA.model.Donacion;
+import com.SIGA.SIGA.model.EstadoDonacion;
+import com.SIGA.SIGA.model.EstadoLote;
+import com.SIGA.SIGA.model.Lote;
 import com.SIGA.SIGA.model.Categoria;
 import com.SIGA.SIGA.model.Donante;
 import com.SIGA.SIGA.model.Producto;
@@ -9,10 +13,14 @@ import com.SIGA.SIGA.model.TipoUbicacion;
 import com.SIGA.SIGA.model.Ubicacion;
 import com.SIGA.SIGA.model.Usuario;
 import com.SIGA.SIGA.repository.CategoriaRepository;
+import com.SIGA.SIGA.repository.DonacionRepository;
 import com.SIGA.SIGA.repository.DonanteRepository;
+import com.SIGA.SIGA.repository.LoteRepository;
 import com.SIGA.SIGA.repository.ProductoRepository;
 import com.SIGA.SIGA.repository.UbicacionRepository;
 import com.SIGA.SIGA.repository.UsuarioRepository;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,6 +39,8 @@ public class SeedConfig {
     private final UbicacionRepository ubicacionRepository;
     private final ProductoRepository productoRepository;
     private final DonanteRepository donanteRepository;
+    private final DonacionRepository donacionRepository;
+    private final LoteRepository loteRepository;
 
     @Value("${siga.seed.admin-email}")
     private String adminEmail;
@@ -116,6 +126,54 @@ public class SeedConfig {
                 Donante d5 = new Donante(null, "63543210", "Juan Carlos Mendoza", TipoDonante.PERSONA_NATURAL, "jcmendoza@hotmail.com", "3001112233", "Carrera 27 # 14-50, Bucaramanga", true);
 
                 donanteRepository.saveAll(List.of(d1, d2, d3, d4, d5));
+            }
+
+            // 6. Semilla de Donaciones y Lotes (CU-01 / RF02 / Figura 4 y 5)
+            if (donacionRepository.count() == 0) {
+                Usuario admin = usuarioRepository.findByEmailIgnoreCase(adminEmail).orElse(null);
+                Donante exito = donanteRepository.findByIdentificacion("900123456-1").orElse(null);
+                Donante alqueria = donanteRepository.findByIdentificacion("890987654-3").orElse(null);
+
+                Ubicacion cam1 = ubicacionRepository.findByCodigoIgnoreCase("CAM-F01").orElse(null);
+                Ubicacion cam2 = ubicacionRepository.findByCodigoIgnoreCase("CAM-F02").orElse(null);
+                Ubicacion estA = ubicacionRepository.findByCodigoIgnoreCase("EST-SEC-A").orElse(null);
+                Ubicacion bodGranos = ubicacionRepository.findByCodigoIgnoreCase("BOD-GRAN-01").orElse(null);
+
+                Producto leche = productoRepository.findByNombreIgnoreCase("Leche Entera 1L").orElse(null);
+                Producto yogurt = productoRepository.findByNombreIgnoreCase("Yogur de Fresa 1L").orElse(null);
+                Producto arroz = productoRepository.findByNombreIgnoreCase("Arroz Blanco 1kg").orElse(null);
+                Producto frijol = productoRepository.findByNombreIgnoreCase("Frijol Rojo 500g").orElse(null);
+                Producto atun = productoRepository.findByNombreIgnoreCase("Atún en Aceite 170g").orElse(null);
+
+                if (exito != null && arroz != null && atun != null) {
+                    Donacion donacionExito = new Donacion();
+                    donacionExito.setDonante(exito);
+                    donacionExito.setUsuarioResponsable(admin);
+                    donacionExito.setFechaRecepcion(LocalDate.now().minusDays(5));
+                    donacionExito.setObservaciones("Donación mensual de granos y abarrotes");
+                    donacionExito.setEstado(EstadoDonacion.RECIBIDA);
+
+                    Lote loteArroz = new Lote(null, "L-ARR-01", arroz, donacionExito, bodGranos, new BigDecimal("300.00"), new BigDecimal("300.00"), "kg", LocalDate.now().minusDays(5), LocalDate.now().plusMonths(6), EstadoLote.DISPONIBLE, null);
+                    Lote loteAtun = new Lote(null, "L-ATU-01", atun, donacionExito, estA, new BigDecimal("120.00"), new BigDecimal("120.00"), "latas", LocalDate.now().minusDays(5), LocalDate.now().plusMonths(12), EstadoLote.DISPONIBLE, null);
+
+                    donacionExito.getLotes().addAll(List.of(loteArroz, loteAtun));
+                    donacionRepository.save(donacionExito);
+                }
+
+                if (alqueria != null && leche != null && yogurt != null) {
+                    Donacion donacionAlqueria = new Donacion();
+                    donacionAlqueria.setDonante(alqueria);
+                    donacionAlqueria.setUsuarioResponsable(admin);
+                    donacionAlqueria.setFechaRecepcion(LocalDate.now().minusDays(2));
+                    donacionAlqueria.setObservaciones("Entrega refrigerada cadena de frío garantizada");
+                    donacionAlqueria.setEstado(EstadoDonacion.RECIBIDA);
+
+                    Lote loteLeche = new Lote(null, "L-LEC-02", leche, donacionAlqueria, cam1, new BigDecimal("150.00"), new BigDecimal("150.00"), "litros", LocalDate.now().minusDays(2), LocalDate.now().plusDays(15), EstadoLote.DISPONIBLE, null);
+                    Lote loteYogurt = new Lote(null, "L-YOG-01", yogurt, donacionAlqueria, cam2, new BigDecimal("80.00"), new BigDecimal("80.00"), "litros", LocalDate.now().minusDays(2), LocalDate.now().plusDays(25), EstadoLote.DISPONIBLE, null);
+
+                    donacionAlqueria.getLotes().addAll(List.of(loteLeche, loteYogurt));
+                    donacionRepository.save(donacionAlqueria);
+                }
             }
         };
     }

@@ -11,6 +11,8 @@ import { ProductsPage } from "../pages/products/ProductsPage";
 import { LocationsPage } from "../pages/locations/LocationsPage";
 import { DonorsPage } from "../pages/donors/DonorsPage";
 import { CategoriesPage } from "../pages/categories/CategoriesPage";
+import { DonationsPage } from "../pages/donations/DonationsPage";
+import { InventoryPage } from "../pages/inventory/InventoryPage";
 
 export const AppRouter = () => {
   const user = useAuthStore((state) => state.user);
@@ -104,10 +106,7 @@ export const AppRouter = () => {
             <Route
               element={
                 <DashboardTemplate user={user!} onLogout={handleLogout}>
-                  <PlaceholderPage
-                    title="Inventario por Lotes"
-                    description="Consulta de productos, lotes, existencias y fechas de vencimiento."
-                  />
+                  <InventoryPage />
                 </DashboardTemplate>
               }
               path="/inventory"
@@ -115,10 +114,7 @@ export const AppRouter = () => {
             <Route
               element={
                 <DashboardTemplate user={user!} onLogout={handleLogout}>
-                  <PlaceholderPage
-                    title="Donaciones"
-                    description="Gestión y recepción de donaciones para el ingreso al almacén."
-                  />
+                  <DonationsPage />
                 </DashboardTemplate>
               }
               path="/donations"
