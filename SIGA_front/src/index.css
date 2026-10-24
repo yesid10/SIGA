@@ -3,3 +3,11 @@
 :root { font-family: 'DM Sans', sans-serif; color: #19231f; background: #f7f8f3; font-synthesis: none; text-rendering: optimizeLegibility; -webkit-font-smoothing: antialiased; }
 body { margin: 0; min-width: 320px; }
 h1, h2 { font-family: 'Manrope', sans-serif; }
+
+button, [role="button"], select, summary, input[type="submit"], input[type="button"], input[type="reset"] {
+  cursor: pointer;
+}
+button:disabled, [role="button"]:disabled, input:disabled {
+  cursor: not-allowed;
+}
+

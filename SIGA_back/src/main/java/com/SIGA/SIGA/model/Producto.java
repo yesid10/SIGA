@@ -42,6 +42,9 @@ public class Producto {
     @Column(name = "unidad_medida", nullable = false, length = 30)
     private String unidadMedida;
 
+    @Column(name = "imagen_url", length = 500)
+    private String imagenUrl;
+
     @Column(nullable = false)
     private boolean activo = true;
 }

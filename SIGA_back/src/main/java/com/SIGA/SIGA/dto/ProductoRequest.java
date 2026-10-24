@@ -20,5 +20,8 @@ public record ProductoRequest(
 
         @NotBlank(message = "La unidad de medida es obligatoria")
         @Size(max = 30, message = "La unidad de medida no puede exceder 30 caracteres")
-        String unidadMedida
+        String unidadMedida,
+
+        @Size(max = 500, message = "La URL de la imagen no puede exceder 500 caracteres")
+        String imagenUrl
 ) {}

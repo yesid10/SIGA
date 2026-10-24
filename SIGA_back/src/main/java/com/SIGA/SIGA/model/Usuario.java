@@ -41,6 +41,9 @@ public class Usuario {
     @Column(nullable = false, length = 30)
     private Rol rol;
 
+    @Column(name = "foto_url", length = 500)
+    private String fotoUrl;
+
     @Column(nullable = false)
     private boolean activo = true;
 }

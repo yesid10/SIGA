@@ -71,7 +71,7 @@ public class DonacionServiceTest {
     void setUp() {
         donante = new Donante(1L, "900123456", "Fundación Esperanza", TipoDonante.EMPRESA, "contacto@esperanza.org", "3001234567", "Calle 10 # 5-20", true);
         categoriaLacteos = new Categoria(1L, "Lácteos", "Productos lácteos", true);
-        productoPerecedero = new Producto(10L, "Leche Entera 1L", "Leche pasteurizada", categoriaLacteos, true, "Litros", true);
+        productoPerecedero = new Producto(10L, "Leche Entera 1L", "Leche pasteurizada", categoriaLacteos, true, "Litros", null, true);
         ubicacionSeca = new Ubicacion(1L, "EST-01", "Estantería A1", TipoUbicacion.SECO, 500.0, true);
         ubicacionRefrigerada = new Ubicacion(2L, "CAM-01", "Cámara Fría 1", TipoUbicacion.REFRIGERADO, 1000.0, true);
     }

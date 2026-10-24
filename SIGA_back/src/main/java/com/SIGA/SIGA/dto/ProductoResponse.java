@@ -10,6 +10,7 @@ public record ProductoResponse(
         String categoriaNombre,
         boolean esPerecedero,
         String unidadMedida,
+        String imagenUrl,
         boolean activo
 ) {
     public static ProductoResponse from(Producto producto) {
@@ -21,6 +22,7 @@ public record ProductoResponse(
                 producto.getCategoria() != null ? producto.getCategoria().getNombre() : null,
                 producto.isEsPerecedero(),
                 producto.getUnidadMedida(),
+                producto.getImagenUrl(),
                 producto.isActivo()
         );
     }

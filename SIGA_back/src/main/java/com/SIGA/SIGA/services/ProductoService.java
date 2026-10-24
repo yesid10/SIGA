@@ -67,6 +67,9 @@ public class ProductoService {
         producto.setCategoria(categoria);
         producto.setEsPerecedero(request.esPerecedero());
         producto.setUnidadMedida(request.unidadMedida().trim().toLowerCase());
+        if (request.imagenUrl() != null && !request.imagenUrl().isBlank()) {
+            producto.setImagenUrl(request.imagenUrl().trim());
+        }
         producto.setActivo(true);
 
         return ProductoResponse.from(productoRepository.save(producto));
@@ -84,6 +87,9 @@ public class ProductoService {
         producto.setCategoria(categoria);
         producto.setEsPerecedero(request.esPerecedero());
         producto.setUnidadMedida(request.unidadMedida().trim().toLowerCase());
+        if (request.imagenUrl() != null) {
+            producto.setImagenUrl(request.imagenUrl().isBlank() ? null : request.imagenUrl().trim());
+        }
 
         return ProductoResponse.from(productoRepository.save(producto));
     }

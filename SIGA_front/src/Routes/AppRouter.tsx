@@ -13,6 +13,7 @@ import { DonorsPage } from "../pages/donors/DonorsPage";
 import { CategoriesPage } from "../pages/categories/CategoriesPage";
 import { DonationsPage } from "../pages/donations/DonationsPage";
 import { InventoryPage } from "../pages/inventory/InventoryPage";
+import { UsersPage } from "../pages/users/UsersPage";
 
 export const AppRouter = () => {
   const user = useAuthStore((state) => state.user);
@@ -128,10 +129,7 @@ export const AppRouter = () => {
             <Route
               element={
                 <DashboardTemplate user={user!} onLogout={handleLogout}>
-                  <PlaceholderPage
-                    title="Usuarios y Roles"
-                    description="Administración de cuentas, colaboradores y asignación de roles."
-                  />
+                  <UsersPage />
                 </DashboardTemplate>
               }
               path="/users"

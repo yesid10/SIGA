@@ -58,6 +58,7 @@ export interface Producto {
   categoriaNombre?: string;
   esPerecedero: boolean;
   unidadMedida: string;
+  imagenUrl?: string | null;
   activo: boolean;
 }
 
@@ -67,6 +68,23 @@ export interface ProductoRequest {
   categoriaId: number;
   esPerecedero: boolean;
   unidadMedida: string;
+  imagenUrl?: string | null;
+}
+
+export interface UsuarioAdmin {
+  id: number;
+  email: string;
+  nombre: string;
+  rol: 'ADMINISTRADOR' | 'ENCARGADO' | 'BENEFICIARIO';
+  activo: boolean;
+  fotoUrl?: string | null;
+}
+
+export interface ActualizarUsuarioRequest {
+  nombre?: string;
+  rol?: 'ADMINISTRADOR' | 'ENCARGADO' | 'BENEFICIARIO';
+  activo?: boolean;
+  fotoUrl?: string | null;
 }
 
 export type EstadoDonacion = 'RECIBIDA' | 'CANCELADA';

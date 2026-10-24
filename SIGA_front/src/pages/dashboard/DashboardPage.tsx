@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   LuBox,
@@ -12,17 +12,32 @@ import {
   LuClipboardList,
   LuUsers,
   LuMapPin,
+  LuChartPie,
+  LuChartBar,
 } from 'react-icons/lu';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+} from 'recharts';
 import { useAuthStore } from '../../stores/authStore';
 import { Badge } from '../../components/atoms/Badge';
 import { Button } from '../../components/atoms/Button';
 import { Spinner } from '../../components/atoms/Spinner';
 import { Eyebrow } from '../../components/atoms/Typography';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../../components/ui/card';
+import { ChartTooltipContent } from '../../components/ui/chart';
 import { DataTable } from '../../components/organisms/DataTable';
 import { getMetricasInventario } from '../../services/inventario';
 import type { InventarioMetricasResponse } from '../../types/catalogs';
 
-export const DashboardPage = () => {
+export const DashboardPage: React.FC = () => {
   const user = useAuthStore((state) => state.user);
   const rol = user?.rol ?? 'BENEFICIARIO';
 
@@ -50,7 +65,7 @@ export const DashboardPage = () => {
   const getRoleBadge = () => {
     switch (rol) {
       case 'ADMINISTRADOR':
-        return <Badge className="border border-indigo-200 bg-indigo-50 text-indigo-800">Administrador</Badge>;
+        return <Badge className="border border-purple-200 bg-purple-50 text-purple-900">Administrador</Badge>;
       case 'ENCARGADO':
         return <Badge className="border border-amber-200 bg-amber-50 text-amber-800">Encargado de Bodega</Badge>;
       case 'BENEFICIARIO':
@@ -100,57 +115,53 @@ export const DashboardPage = () => {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
-        <article className="flex flex-col justify-between rounded-xl border border-slate-200 bg-white p-6 shadow-xs transition hover:shadow-md">
-          <div>
-            <div className="flex items-center justify-between">
-              <span className="grid size-10 place-items-center rounded-lg bg-emerald-50 text-emerald-700">
-                <LuBox className="size-5" />
-              </span>
-              <Badge className="bg-emerald-50 text-emerald-800">Disponible</Badge>
-            </div>
-            <h3 className="mt-5 font-display text-lg font-bold text-slate-900">
-              Catálogo de Alimentos
-            </h3>
-            <p className="mt-2 text-sm leading-relaxed text-slate-500">
-              Explora los alimentos perecederos y no perecederos registrados en el banco para armar tu solicitud.
-            </p>
+        <Card className="p-6 shadow-xs hover:shadow-md transition">
+          <div className="flex items-center justify-between">
+            <span className="grid size-10 place-items-center rounded-lg bg-emerald-50 text-emerald-700">
+              <LuBox className="size-5" />
+            </span>
+            <Badge className="bg-emerald-50 text-emerald-800">Disponible</Badge>
           </div>
+          <h3 className="mt-5 font-display text-lg font-bold text-slate-900">
+            Catálogo de Alimentos
+          </h3>
+          <p className="mt-2 text-sm leading-relaxed text-slate-500">
+            Explora los alimentos perecederos y no perecederos registrados en el banco para armar tu solicitud.
+          </p>
           <div className="mt-6 border-t border-slate-100 pt-4">
             <Link
               to="/products"
-              className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-700 hover:text-emerald-900"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-700 hover:text-emerald-900 cursor-pointer"
             >
               <span>Explorar productos disponibles</span>
               <LuArrowRight className="size-4" />
             </Link>
           </div>
-        </article>
+        </Card>
 
-        <article className="flex flex-col justify-between rounded-xl border border-slate-200 bg-white p-6 shadow-xs transition hover:shadow-md">
-          <div>
-            <div className="flex items-center justify-between">
-              <span className="grid size-10 place-items-center rounded-lg bg-indigo-50 text-indigo-700">
-                <LuClipboardList className="size-5" />
-              </span>
-              <Badge className="bg-indigo-50 text-indigo-800">Seguimiento</Badge>
-            </div>
-            <h3 className="mt-5 font-display text-lg font-bold text-slate-900">
-              Mis Solicitudes
-            </h3>
-            <p className="mt-2 text-sm leading-relaxed text-slate-500">
-              Consulta en tiempo real si tus pedidos se encuentran pendientes, aprobados, atendidos parcialmente o listos para retiro.
-            </p>
+        <Card className="p-6 shadow-xs hover:shadow-md transition">
+          <div className="flex items-center justify-between">
+            <span className="grid size-10 place-items-center rounded-lg bg-indigo-50 text-indigo-700">
+              <LuClipboardList className="size-5" />
+            </span>
+            <Badge className="bg-indigo-50 text-indigo-800">Seguimiento</Badge>
           </div>
+          <h3 className="mt-5 font-display text-lg font-bold text-slate-900">
+            Mis Solicitudes
+          </h3>
+          <p className="mt-2 text-sm leading-relaxed text-slate-500">
+            Consulta en tiempo real si tus pedidos se encuentran pendientes, aprobados, atendidos parcialmente o listos para retiro.
+          </p>
           <div className="mt-6 border-t border-slate-100 pt-4">
             <Link
               to="/requests"
-              className="inline-flex items-center gap-2 text-sm font-semibold text-indigo-700 hover:text-indigo-900"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-indigo-700 hover:text-indigo-900 cursor-pointer"
             >
               <span>Consultar historial de solicitudes</span>
               <LuArrowRight className="size-4" />
             </Link>
           </div>
-        </article>
+        </Card>
       </div>
 
       <div className="rounded-xl border border-slate-200 bg-white p-6">
@@ -170,17 +181,30 @@ export const DashboardPage = () => {
   const renderOperationalDashboard = () => {
     if (!metricas) return null;
 
-    const totalLotesCount =
-      metricas.estadoLotes.disponibles +
-      metricas.estadoLotes.proximosAVencer +
-      metricas.estadoLotes.vencidos || 1;
+    // Data for Donut Chart (Estado de Lotes)
+    const estadoLotesData = [
+      { name: 'Disponibles', value: metricas.estadoLotes.disponibles, color: '#10b981' },
+      { name: 'Próximos a Vencer', value: metricas.estadoLotes.proximosAVencer, color: '#f59e0b' },
+      { name: 'Vencidos', value: metricas.estadoLotes.vencidos, color: '#ef4444' },
+    ];
 
-    const pctDisponibles = Math.round((metricas.estadoLotes.disponibles / totalLotesCount) * 100);
-    const pctProximos = Math.round((metricas.estadoLotes.proximosAVencer / totalLotesCount) * 100);
-    const pctVencidos = Math.round((metricas.estadoLotes.vencidos / totalLotesCount) * 100);
+    // Data for Bar Chart (Lotes por Tiempo de Vencimiento)
+    const tiempoVencimientoData = [
+      { tiempo: '> 3 Meses', lotes: metricas.lotesPorTiempo.masDe3Meses, fill: '#10b981' },
+      { tiempo: '1-3 Meses', lotes: metricas.lotesPorTiempo.unoATresMeses, fill: '#3b82f6' },
+      { tiempo: '≤ 30 Días', lotes: metricas.lotesPorTiempo.treintaDiasOMenos, fill: '#f59e0b' },
+      { tiempo: 'Vencidos', lotes: metricas.lotesPorTiempo.vencidos, fill: '#ef4444' },
+    ];
+
+    // Data for Categories Bar Chart
+    const categoriasData = metricas.productosPorCategoria.map((c) => ({
+      name: c.categoria.length > 12 ? c.categoria.substring(0, 10) + '...' : c.categoria,
+      cantidad: c.cantidad,
+      porcentaje: c.porcentaje,
+    }));
 
     return (
-      <div className="mt-8 space-y-8">
+      <div className="mt-8 space-y-8 animate-in fade-in duration-300">
         {/* Top Header with Quick Actions */}
         <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-xs">
           <div>
@@ -212,8 +236,7 @@ export const DashboardPage = () => {
 
         {/* 5 KPI Cards (Figura 3) */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-          {/* 1. Productos Disponibles */}
-          <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-xs">
+          <Card className="p-5 shadow-xs hover:border-emerald-300 transition">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
                 Productos Disponibles
@@ -229,10 +252,9 @@ export const DashboardPage = () => {
               <LuCheck className="size-3.5" />
               <span>Con stock en bodega</span>
             </p>
-          </div>
+          </Card>
 
-          {/* 2. Lotes Registrados */}
-          <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-xs">
+          <Card className="p-5 shadow-xs hover:border-blue-300 transition">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
                 Lotes Registrados
@@ -245,12 +267,11 @@ export const DashboardPage = () => {
               {metricas.lotesRegistrados}
             </p>
             <p className="mt-1 text-xs text-blue-700 font-semibold">
-              {metricas.estadoLotes.disponibles} activos
+              {metricas.estadoLotes.disponibles} activos en bodega
             </p>
-          </div>
+          </Card>
 
-          {/* 3. Próximos a Vencer */}
-          <div className="rounded-xl border border-amber-200 bg-amber-50/50 p-5 shadow-xs">
+          <Card className="p-5 shadow-xs border-amber-200 bg-amber-50/40 hover:border-amber-300 transition">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold uppercase tracking-wider text-amber-800">
                 Próximos a Vencer
@@ -265,10 +286,9 @@ export const DashboardPage = () => {
             <p className="mt-1 text-xs text-amber-700 font-semibold">
               En los próximos 30 días
             </p>
-          </div>
+          </Card>
 
-          {/* 4. Donaciones Registradas */}
-          <div className="rounded-xl border border-indigo-200 bg-indigo-50/40 p-5 shadow-xs">
+          <Card className="p-5 shadow-xs border-indigo-200 bg-indigo-50/30 hover:border-indigo-300 transition">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold uppercase tracking-wider text-indigo-800">
                 Donaciones Registradas
@@ -283,10 +303,9 @@ export const DashboardPage = () => {
             <p className="mt-1 text-xs text-indigo-700 font-semibold">
               Historial de ingresos
             </p>
-          </div>
+          </Card>
 
-          {/* 5. Alertas de Vencimiento */}
-          <div className="rounded-xl border border-red-200 bg-red-50/50 p-5 shadow-xs">
+          <Card className="p-5 shadow-xs border-red-200 bg-red-50/40 hover:border-red-300 transition">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold uppercase tracking-wider text-red-800">
                 Alertas de Vencimiento
@@ -301,232 +320,229 @@ export const DashboardPage = () => {
             <p className="mt-1 text-xs text-red-700 font-semibold">
               Requieren rotación FEFO
             </p>
-          </div>
+          </Card>
         </div>
 
-        {/* Analytical Visual Breakdown (4 Blocks matching Figura 3) */}
+        {/* shadcn Charts Section (Recharts Graphical Widgets) */}
         <div className="grid gap-6 md:grid-cols-2">
-          {/* Distribución por Categorías */}
-          <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-xs">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <h3 className="font-display text-base font-bold text-slate-900">
-                Distribución por Categorías
-              </h3>
-              <span className="text-xs text-slate-400">Existencias actuales</span>
-            </div>
-            <div className="mt-4 space-y-3">
-              {metricas.productosPorCategoria.length === 0 ? (
-                <p className="py-4 text-center text-xs text-slate-400">Sin datos registrados</p>
-              ) : (
-                metricas.productosPorCategoria.map((cat) => (
-                  <div key={cat.categoria}>
-                    <div className="flex items-center justify-between text-xs font-medium">
-                      <span className="text-slate-700">{cat.categoria}</span>
-                      <span className="text-slate-500 font-mono">
-                        {cat.cantidad} ({cat.porcentaje}%)
-                      </span>
-                    </div>
-                    <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-slate-100">
-                      <div
-                        className="h-full rounded-full bg-emerald-600 transition-all duration-500"
-                        style={{ width: `${Math.min(cat.porcentaje, 100)}%` }}
-                      />
-                    </div>
+          {/* Chart 1: Categorías (shadcn BarChart) */}
+          <Card className="shadow-xs">
+            <CardHeader className="pb-2">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <LuChartBar className="size-4 text-emerald-800" />
+                    <span>Distribución por Categorías</span>
+                  </CardTitle>
+                  <CardDescription>Cantidad de existencias catalogadas por tipo de alimento</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-2">
+              <div className="h-64 w-full">
+                {categoriasData.length === 0 ? (
+                  <div className="flex h-full items-center justify-center text-xs text-slate-400">
+                    Sin categorías registradas
                   </div>
-                ))
-              )}
-            </div>
-          </div>
-
-          {/* Estado de Lotes */}
-          <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-xs">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <h3 className="font-display text-base font-bold text-slate-900">
-                Estado de Lotes
-              </h3>
-              <span className="text-xs text-slate-400">Total: {totalLotesCount} lotes</span>
-            </div>
-            <div className="mt-4">
-              {/* Stacked bar */}
-              <div className="flex h-3 w-full overflow-hidden rounded-full bg-slate-100">
-                <div
-                  className="bg-emerald-500 transition-all duration-500"
-                  style={{ width: `${pctDisponibles}%` }}
-                  title={`Disponibles: ${pctDisponibles}%`}
-                />
-                <div
-                  className="bg-amber-400 transition-all duration-500"
-                  style={{ width: `${pctProximos}%` }}
-                  title={`Próximos a vencer: ${pctProximos}%`}
-                />
-                <div
-                  className="bg-red-500 transition-all duration-500"
-                  style={{ width: `${pctVencidos}%` }}
-                  title={`Vencidos: ${pctVencidos}%`}
-                />
+                ) : (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={categoriasData} margin={{ top: 10, right: 10, left: -20, bottom: 20 }}>
+                      <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#64748b' }} interval={0} angle={-15} textAnchor="end" />
+                      <YAxis tick={{ fontSize: 11, fill: '#64748b' }} />
+                      <Tooltip content={<ChartTooltipContent />} />
+                      <Bar dataKey="cantidad" name="Productos" fill="#047857" radius={[6, 6, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                )}
               </div>
+            </CardContent>
+          </Card>
 
-              <div className="mt-6 grid grid-cols-3 gap-3 text-center">
-                <div className="rounded-lg bg-emerald-50 p-3">
-                  <span className="block text-xs font-semibold text-emerald-800">Disponibles</span>
-                  <span className="mt-1 block font-mono text-xl font-bold text-emerald-950">
-                    {metricas.estadoLotes.disponibles}
-                  </span>
-                  <span className="text-[11px] text-emerald-700">{pctDisponibles}%</span>
-                </div>
-
-                <div className="rounded-lg bg-amber-50 p-3">
-                  <span className="block text-xs font-semibold text-amber-800">Próximos a vencer</span>
-                  <span className="mt-1 block font-mono text-xl font-bold text-amber-950">
-                    {metricas.estadoLotes.proximosAVencer}
-                  </span>
-                  <span className="text-[11px] text-amber-700">{pctProximos}%</span>
-                </div>
-
-                <div className="rounded-lg bg-red-50 p-3">
-                  <span className="block text-xs font-semibold text-red-800">Vencidos</span>
-                  <span className="mt-1 block font-mono text-xl font-bold text-red-950">
-                    {metricas.estadoLotes.vencidos}
-                  </span>
-                  <span className="text-[11px] text-red-700">{pctVencidos}%</span>
+          {/* Chart 2: Estado de Lotes (shadcn Donut Chart) */}
+          <Card className="shadow-xs">
+            <CardHeader className="pb-2">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <LuChartPie className="size-4 text-emerald-800" />
+                    <span>Estado de Lotes en Bodega</span>
+                  </CardTitle>
+                  <CardDescription>Semáforo de inventario y condición de caducidad</CardDescription>
                 </div>
               </div>
-            </div>
-          </div>
+            </CardHeader>
+            <CardContent className="pt-2">
+              <div className="h-64 w-full flex items-center justify-center">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={estadoLotesData}
+                      dataKey="value"
+                      nameKey="name"
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={55}
+                      outerRadius={85}
+                      paddingAngle={4}
+                    >
+                      {estadoLotesData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip content={<ChartTooltipContent />} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="flex items-center justify-center gap-4 text-xs mt-2 border-t border-slate-100 pt-3">
+                <div className="flex items-center gap-1.5">
+                  <span className="size-2.5 rounded-full bg-emerald-500" />
+                  <span className="text-slate-600">Disponibles ({metricas.estadoLotes.disponibles})</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="size-2.5 rounded-full bg-amber-500" />
+                  <span className="text-slate-600">Próximos ({metricas.estadoLotes.proximosAVencer})</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="size-2.5 rounded-full bg-red-500" />
+                  <span className="text-slate-600">Vencidos ({metricas.estadoLotes.vencidos})</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
-          {/* Donaciones por Tipo */}
-          <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-xs">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <h3 className="font-display text-base font-bold text-slate-900">
-                Donaciones por Tipo
-              </h3>
-              <span className="text-xs text-slate-400">Modalidad de donación</span>
-            </div>
-            <div className="mt-4 space-y-3">
+          {/* Chart 3: Lotes por Tiempo de Vencimiento (Ventana FEFO) */}
+          <Card className="shadow-xs">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base flex items-center gap-2">
+                <LuClock className="size-4 text-blue-700" />
+                <span>Lotes por Tiempo de Vencimiento</span>
+              </CardTitle>
+              <CardDescription>Ventana temporal de rotación FEFO en almacén</CardDescription>
+            </CardHeader>
+            <CardContent className="pt-2">
+              <div className="h-56 w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={tiempoVencimientoData} margin={{ top: 10, right: 10, left: -20, bottom: 10 }}>
+                    <XAxis dataKey="tiempo" tick={{ fontSize: 11, fill: '#64748b' }} />
+                    <YAxis tick={{ fontSize: 11, fill: '#64748b' }} />
+                    <Tooltip content={<ChartTooltipContent />} />
+                    <Bar dataKey="lotes" name="Lotes" radius={[6, 6, 0, 0]}>
+                      {tiempoVencimientoData.map((entry, index) => (
+                        <Cell key={`bar-${index}`} fill={entry.fill} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Widget 4: Donaciones por Modalidad */}
+          <Card className="shadow-xs">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base flex items-center gap-2">
+                <LuHeartHandshake className="size-4 text-indigo-700" />
+                <span>Donaciones por Modalidad</span>
+              </CardTitle>
+              <CardDescription>Resumen de tipos de contribuciones recibidas</CardDescription>
+            </CardHeader>
+            <CardContent className="pt-2 space-y-3">
               {metricas.donacionesPorTipo.length === 0 ? (
-                <p className="py-4 text-center text-xs text-slate-400">Sin donaciones registradas</p>
+                <p className="py-8 text-center text-xs text-slate-400">Sin donaciones registradas</p>
               ) : (
                 metricas.donacionesPorTipo.map((tipo) => (
-                  <div key={tipo.tipo} className="flex items-center justify-between rounded-lg border border-slate-100 p-3">
-                    <span className="text-xs font-semibold text-slate-700">{tipo.tipo}</span>
+                  <div key={tipo.tipo} className="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50/50 p-3.5">
+                    <span className="text-xs font-bold text-slate-800">{tipo.tipo}</span>
                     <Badge className="bg-indigo-50 text-indigo-800 font-mono">
                       {`${tipo.cantidad} donación(es)`}
                     </Badge>
                   </div>
                 ))
               )}
-            </div>
-          </div>
-
-          {/* Lotes por Tiempo de Vencimiento */}
-          <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-xs">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <h3 className="font-display text-base font-bold text-slate-900">
-                Lotes por Tiempo de Vencimiento
-              </h3>
-              <span className="text-xs text-slate-400">Ventana temporal FEFO</span>
-            </div>
-            <div className="mt-4 space-y-2.5">
-              <div className="flex items-center justify-between text-xs">
-                <span className="font-medium text-emerald-800">Más de 3 meses:</span>
-                <span className="font-bold text-slate-900 font-mono">{metricas.lotesPorTiempo.masDe3Meses} lotes</span>
-              </div>
-              <div className="flex items-center justify-between text-xs">
-                <span className="font-medium text-blue-800">Entre 1 y 3 meses:</span>
-                <span className="font-bold text-slate-900 font-mono">{metricas.lotesPorTiempo.unoATresMeses} lotes</span>
-              </div>
-              <div className="flex items-center justify-between text-xs">
-                <span className="font-medium text-amber-800">30 días o menos (Alerta):</span>
-                <span className="font-bold text-amber-900 font-mono">{metricas.lotesPorTiempo.treintaDiasOMenos} lotes</span>
-              </div>
-              <div className="flex items-center justify-between text-xs">
-                <span className="font-medium text-red-800">Vencidos:</span>
-                <span className="font-bold text-red-900 font-mono">{metricas.lotesPorTiempo.vencidos} lotes</span>
-              </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* 2 Operational Tables (Figura 3) */}
         <div className="grid gap-6 lg:grid-cols-2">
           {/* Últimas Donaciones */}
-          <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-xs">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-              <div>
-                <h3 className="font-display text-base font-bold text-slate-900">
-                  Últimas Donaciones
-                </h3>
-                <p className="text-xs text-slate-500">Ingresos recientes al banco de alimentos</p>
+          <Card className="shadow-xs">
+            <CardHeader className="pb-3 border-b border-slate-100">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-base">Últimas Donaciones</CardTitle>
+                  <CardDescription>Ingresos recientes al banco de alimentos</CardDescription>
+                </div>
+                <Link to="/donations" className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-800 hover:text-emerald-950 cursor-pointer">
+                  <span>Ver todas</span>
+                  <LuArrowRight className="size-3.5" />
+                </Link>
               </div>
-              <Link to="/donations" className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 hover:text-emerald-900">
-                <span>Ver todas</span>
-                <LuArrowRight className="size-3.5" />
-              </Link>
-            </div>
-            <div className="mt-4">
+            </CardHeader>
+            <CardContent className="p-0">
               <DataTable
                 headers={['Donante', 'Fecha', 'Productos / Cant.', 'Estado']}
                 emptyMessage="No hay donaciones registradas."
               >
                 {metricas.ultimasDonaciones.slice(0, 5).map((d) => (
                   <tr key={d.id} className="border-b border-slate-100 hover:bg-slate-50/70">
-                    <td className="px-3 py-2.5 font-semibold text-slate-900 text-xs">
+                    <td className="px-4 py-3 font-semibold text-slate-900 text-xs">
                       {d.donanteNombre}
                     </td>
-                    <td className="px-3 py-2.5 text-xs text-slate-500 font-mono">
+                    <td className="px-4 py-3 text-xs text-slate-500 font-mono">
                       {d.fechaRecepcion}
                     </td>
-                    <td className="px-3 py-2.5 text-xs text-slate-700">
+                    <td className="px-4 py-3 text-xs text-slate-700">
                       {d.totalProductos} prod. ({d.totalCantidad} unid.)
                     </td>
-                    <td className="px-3 py-2.5 text-xs">
+                    <td className="px-4 py-3 text-xs">
                       <Badge className="bg-emerald-50 text-emerald-800">{d.estado}</Badge>
                     </td>
                   </tr>
                 ))}
               </DataTable>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
           {/* Alertas Recientes */}
-          <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-xs">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-              <div>
-                <h3 className="font-display text-base font-bold text-slate-900">
-                  Alertas Recientes
-                </h3>
-                <p className="text-xs text-slate-500">Productos con vencimiento próximo o crítico</p>
+          <Card className="shadow-xs">
+            <CardHeader className="pb-3 border-b border-slate-100">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-base">Alertas Recientes</CardTitle>
+                  <CardDescription>Productos con vencimiento próximo o crítico</CardDescription>
+                </div>
+                <Link to="/inventory" className="inline-flex items-center gap-1 text-xs font-semibold text-red-700 hover:text-red-900 cursor-pointer">
+                  <span>Ir al inventario</span>
+                  <LuArrowRight className="size-3.5" />
+                </Link>
               </div>
-              <Link to="/inventory" className="inline-flex items-center gap-1 text-xs font-semibold text-red-700 hover:text-red-900">
-                <span>Ir al inventario</span>
-                <LuArrowRight className="size-3.5" />
-              </Link>
-            </div>
-            <div className="mt-4">
+            </CardHeader>
+            <CardContent className="p-0">
               <DataTable
                 headers={['Lote', 'Producto', 'Días Rest.', 'Urgencia', 'Acción']}
                 emptyMessage="No hay alertas críticas en este momento."
               >
                 {metricas.alertasRecientes.slice(0, 5).map((alerta) => (
                   <tr key={alerta.loteId} className="border-b border-slate-100 hover:bg-slate-50/70">
-                    <td className="px-3 py-2.5 font-mono text-xs font-bold text-slate-900">
+                    <td className="px-4 py-3 font-mono text-xs font-bold text-slate-900">
                       {alerta.numeroLote}
                     </td>
-                    <td className="px-3 py-2.5 text-xs font-medium text-slate-800">
+                    <td className="px-4 py-3 text-xs font-medium text-slate-800">
                       {alerta.productoNombre}
                     </td>
-                    <td className="px-3 py-2.5 text-xs">
+                    <td className="px-4 py-3 text-xs">
                       <span className={`font-semibold ${alerta.diasRestantes <= 0 ? 'text-red-600' : 'text-amber-700'}`}>
                         {alerta.diasRestantes < 0 ? `Vencido` : `${alerta.diasRestantes} días`}
                       </span>
                     </td>
-                    <td className="px-3 py-2.5 text-xs">
+                    <td className="px-4 py-3 text-xs">
                       {getUrgencyBadge(alerta.urgencia)}
                     </td>
-                    <td className="px-3 py-2.5 text-xs">
+                    <td className="px-4 py-3 text-xs">
                       <Link
                         to="/inventory"
-                        className="inline-flex items-center gap-1 rounded px-2 py-0.5 text-xs font-semibold text-emerald-700 hover:bg-emerald-50"
+                        className="inline-flex items-center gap-1 rounded px-2.5 py-1 text-xs font-semibold text-emerald-800 hover:bg-emerald-50 cursor-pointer"
                       >
                         <span>Gestionar</span>
                       </Link>
@@ -534,40 +550,48 @@ export const DashboardPage = () => {
                   </tr>
                 ))}
               </DataTable>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Admin Quick Links when role is ADMINISTRADOR */}
         {rol === 'ADMINISTRADOR' && (
-          <div className="rounded-xl border border-indigo-100 bg-indigo-50/30 p-6">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-indigo-700">
-              Accesos de Gobernanza y Configuración
+          <div className="rounded-2xl border border-purple-100 bg-purple-50/30 p-6">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-purple-900">
+              Accesos de Gobernanza y Configuración (Admin)
             </h4>
             <div className="mt-4 grid gap-4 sm:grid-cols-4">
-              <Link to="/users" className="flex items-center gap-3 rounded-lg border border-slate-200 bg-white p-3 hover:border-indigo-300">
-                <LuUsers className="size-5 text-indigo-600" />
+              <Link to="/users" className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-3.5 hover:border-purple-300 hover:shadow-xs transition cursor-pointer">
+                <div className="grid size-9 place-items-center rounded-lg bg-purple-50 text-purple-700">
+                  <LuUsers className="size-5" />
+                </div>
                 <div>
                   <span className="block text-xs font-bold text-slate-900">Usuarios & Roles</span>
                   <span className="text-[11px] text-slate-400">Control RBAC</span>
                 </div>
               </Link>
-              <Link to="/products" className="flex items-center gap-3 rounded-lg border border-slate-200 bg-white p-3 hover:border-emerald-300">
-                <LuBox className="size-5 text-emerald-600" />
+              <Link to="/products" className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-3.5 hover:border-emerald-300 hover:shadow-xs transition cursor-pointer">
+                <div className="grid size-9 place-items-center rounded-lg bg-emerald-50 text-emerald-700">
+                  <LuBox className="size-5" />
+                </div>
                 <div>
                   <span className="block text-xs font-bold text-slate-900">Catálogo Productos</span>
-                  <span className="text-[11px] text-slate-400">Perecederos</span>
+                  <span className="text-[11px] text-slate-400">Cards & Fotos</span>
                 </div>
               </Link>
-              <Link to="/locations" className="flex items-center gap-3 rounded-lg border border-slate-200 bg-white p-3 hover:border-blue-300">
-                <LuMapPin className="size-5 text-blue-600" />
+              <Link to="/locations" className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-3.5 hover:border-blue-300 hover:shadow-xs transition cursor-pointer">
+                <div className="grid size-9 place-items-center rounded-lg bg-blue-50 text-blue-700">
+                  <LuMapPin className="size-5" />
+                </div>
                 <div>
                   <span className="block text-xs font-bold text-slate-900">Ubicaciones</span>
                   <span className="text-[11px] text-slate-400">Bodega & Frío</span>
                 </div>
               </Link>
-              <Link to="/donors" className="flex items-center gap-3 rounded-lg border border-slate-200 bg-white p-3 hover:border-amber-300">
-                <LuHeartHandshake className="size-5 text-amber-600" />
+              <Link to="/donors" className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-3.5 hover:border-amber-300 hover:shadow-xs transition cursor-pointer">
+                <div className="grid size-9 place-items-center rounded-lg bg-amber-50 text-amber-700">
+                  <LuHeartHandshake className="size-5" />
+                </div>
                 <div>
                   <span className="block text-xs font-bold text-slate-900">Directorio Donantes</span>
                   <span className="text-[11px] text-slate-400">Aliados</span>

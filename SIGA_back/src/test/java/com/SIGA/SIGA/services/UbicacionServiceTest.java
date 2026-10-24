@@ -63,7 +63,7 @@ class UbicacionServiceTest {
     @Test
     void reglaRF14_ProductoPerecederoEnUbicacionSeca_LanzaReglaNegocioException() {
         Categoria cat = new Categoria(1L, "Lácteos", "Productos lácteos", true);
-        Producto leche = new Producto(10L, "Leche Entera", "1L", cat, true, "litros", true);
+        Producto leche = new Producto(10L, "Leche Entera", "1L", cat, true, "litros", null, true);
         Ubicacion bodegaSeca = new Ubicacion(20L, "EST-SECO", "Bodega Principal Seca", TipoUbicacion.SECO, 1000.0, true);
 
         // RF-14: El sistema debe rechazar la asignación
@@ -79,7 +79,7 @@ class UbicacionServiceTest {
     @Test
     void reglaRF14_ProductoPerecederoEnUbicacionRefrigerada_EsValido() {
         Categoria cat = new Categoria(1L, "Lácteos", "Productos lácteos", true);
-        Producto leche = new Producto(10L, "Leche Entera", "1L", cat, true, "litros", true);
+        Producto leche = new Producto(10L, "Leche Entera", "1L", cat, true, "litros", null, true);
         Ubicacion cuartoFrio = new Ubicacion(21L, "FRIGO-01", "Cámara Fría 1", TipoUbicacion.REFRIGERADO, 500.0, true);
 
         // Debe ejecutarse sin lanzar excepción
@@ -89,7 +89,7 @@ class UbicacionServiceTest {
     @Test
     void reglaRF14_ProductoNoPerecederoEnUbicacionSeca_EsValido() {
         Categoria cat = new Categoria(2L, "Granos", "Granos y cereales", true);
-        Producto arroz = new Producto(11L, "Arroz", "1kg", cat, false, "kg", true);
+        Producto arroz = new Producto(11L, "Arroz", "1kg", cat, false, "kg", null, true);
         Ubicacion bodegaSeca = new Ubicacion(20L, "EST-SECO", "Bodega Principal Seca", TipoUbicacion.SECO, 1000.0, true);
 
         assertDoesNotThrow(() -> ubicacionService.validarCompatibilidadAlmacenamiento(arroz, bodegaSeca));

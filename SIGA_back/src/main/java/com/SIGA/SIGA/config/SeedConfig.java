@@ -59,7 +59,30 @@ public class SeedConfig {
                 admin.setPassword(passwordEncoder.encode(adminPassword));
                 admin.setRol(Rol.ADMINISTRADOR);
                 admin.setActivo(true);
+                admin.setFotoUrl("https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&auto=format&fit=crop&q=60");
                 usuarioRepository.save(admin);
+            }
+
+            if (!usuarioRepository.existsByEmailIgnoreCase("encargado@siga.org")) {
+                Usuario encargado = new Usuario();
+                encargado.setNombre("Carlos Encargado Bodega");
+                encargado.setEmail("encargado@siga.org");
+                encargado.setPassword(passwordEncoder.encode("Password123*"));
+                encargado.setRol(Rol.ENCARGADO);
+                encargado.setActivo(true);
+                encargado.setFotoUrl("https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=60");
+                usuarioRepository.save(encargado);
+            }
+
+            if (!usuarioRepository.existsByEmailIgnoreCase("beneficiario@siga.org")) {
+                Usuario bene = new Usuario();
+                bene.setNombre("Fundación Manos Unidas");
+                bene.setEmail("beneficiario@siga.org");
+                bene.setPassword(passwordEncoder.encode("Password123*"));
+                bene.setRol(Rol.BENEFICIARIO);
+                bene.setActivo(true);
+                bene.setFotoUrl("https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=60");
+                usuarioRepository.save(bene);
             }
 
             // 2. Semilla de Categorías
@@ -88,32 +111,32 @@ public class SeedConfig {
             // 4. Semilla de Productos (RF-03: esPerecedero y unidadMedida)
             if (productoRepository.count() == 0) {
                 categoriaRepository.findByNombreIgnoreCase("Lácteos y Derivados").ifPresent(cat -> {
-                    productoRepository.save(new Producto(null, "Leche Entera 1L", "Bolsa de leche pasteurizada", cat, true, "litros", true));
-                    productoRepository.save(new Producto(null, "Yogur de Fresa 1L", "Bebida láctea fermentada", cat, true, "litros", true));
-                    productoRepository.save(new Producto(null, "Queso Campesino 500g", "Queso blanco fresco en bloque", cat, true, "unidades", true));
+                    productoRepository.save(new Producto(null, "Leche Entera 1L", "Bolsa de leche pasteurizada", cat, true, "litros", "https://images.unsplash.com/photo-1550583724-b2692b85b150?w=500&auto=format&fit=crop&q=60", true));
+                    productoRepository.save(new Producto(null, "Yogur de Fresa 1L", "Bebida láctea fermentada", cat, true, "litros", "https://images.unsplash.com/photo-1488477181946-6428a0291777?w=500&auto=format&fit=crop&q=60", true));
+                    productoRepository.save(new Producto(null, "Queso Campesino 500g", "Queso blanco fresco en bloque", cat, true, "unidades", "https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?w=500&auto=format&fit=crop&q=60", true));
                 });
 
                 categoriaRepository.findByNombreIgnoreCase("Carnes y Aves").ifPresent(cat -> {
-                    productoRepository.save(new Producto(null, "Pechuga de Pollo", "Pechuga fresca refrigerada", cat, true, "kg", true));
+                    productoRepository.save(new Producto(null, "Pechuga de Pollo", "Pechuga fresca refrigerada", cat, true, "kg", "https://images.unsplash.com/photo-1604503468506-a8da13d82791?w=500&auto=format&fit=crop&q=60", true));
                 });
 
                 categoriaRepository.findByNombreIgnoreCase("Frutas y Verduras").ifPresent(cat -> {
-                    productoRepository.save(new Producto(null, "Manzana Roja", "Manzanas frescas por kilo", cat, true, "kg", true));
-                    productoRepository.save(new Producto(null, "Zanahoria Fresca", "Bolsa de zanahorias lavadas", cat, true, "kg", true));
+                    productoRepository.save(new Producto(null, "Manzana Roja", "Manzanas frescas por kilo", cat, true, "kg", "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=500&auto=format&fit=crop&q=60", true));
+                    productoRepository.save(new Producto(null, "Zanahoria Fresca", "Bolsa de zanahorias lavadas", cat, true, "kg", "https://images.unsplash.com/photo-1598170845058-32b9d6a5c317?w=500&auto=format&fit=crop&q=60", true));
                 });
 
                 categoriaRepository.findByNombreIgnoreCase("Granos y Cereales").ifPresent(cat -> {
-                    productoRepository.save(new Producto(null, "Arroz Blanco 1kg", "Arroz de grano largo seleccionado", cat, false, "kg", true));
-                    productoRepository.save(new Producto(null, "Frijol Rojo 500g", "Frijol bola roja empacado", cat, false, "unidades", true));
-                    productoRepository.save(new Producto(null, "Lenteja Seleccionada 500g", "Lentejas secas de cocción rápida", cat, false, "unidades", true));
+                    productoRepository.save(new Producto(null, "Arroz Blanco 1kg", "Arroz de grano largo seleccionado", cat, false, "kg", "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=500&auto=format&fit=crop&q=60", true));
+                    productoRepository.save(new Producto(null, "Frijol Rojo 500g", "Frijol bola roja empacado", cat, false, "unidades", "https://images.unsplash.com/photo-1551462147-ff29053bfc14?w=500&auto=format&fit=crop&q=60", true));
+                    productoRepository.save(new Producto(null, "Lenteja Seleccionada 500g", "Lentejas secas de cocción rápida", cat, false, "unidades", "https://images.unsplash.com/photo-1505253758473-96b3015f21c9?w=500&auto=format&fit=crop&q=60", true));
                 });
 
                 categoriaRepository.findByNombreIgnoreCase("Enlatados y Conservas").ifPresent(cat -> {
-                    productoRepository.save(new Producto(null, "Atún en Aceite 170g", "Lata de lomos de atún", cat, false, "latas", true));
+                    productoRepository.save(new Producto(null, "Atún en Aceite 170g", "Lata de lomos de atún", cat, false, "latas", "https://images.unsplash.com/photo-1544943910-4c1dc44a0eb9?w=500&auto=format&fit=crop&q=60", true));
                 });
 
                 categoriaRepository.findByNombreIgnoreCase("Panadería y Pastas").ifPresent(cat -> {
-                    productoRepository.save(new Producto(null, "Spaghetti 500g", "Pasta de sémola de trigo", cat, false, "paquetes", true));
+                    productoRepository.save(new Producto(null, "Spaghetti 500g", "Pasta de sémola de trigo", cat, false, "paquetes", "https://images.unsplash.com/photo-1612927601601-6638404737ce?w=500&auto=format&fit=crop&q=60", true));
                 });
             }
 
