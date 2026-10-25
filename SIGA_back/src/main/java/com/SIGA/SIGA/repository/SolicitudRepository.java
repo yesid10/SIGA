@@ -9,4 +9,5 @@ public interface SolicitudRepository extends JpaRepository<Solicitud, Long> {
     List<Solicitud> findAllByOrderByFechaSolicitudDesc();
     List<Solicitud> findByBeneficiarioIdOrderByFechaSolicitudDesc(Long beneficiarioId);
     List<Solicitud> findByEstadoOrderByFechaSolicitudDesc(EstadoSolicitud estado);
+    List<Solicitud> findByFechaSolicitudBetweenOrderByFechaSolicitudDesc(java.time.LocalDate desde, java.time.LocalDate hasta);
 }

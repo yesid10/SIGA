@@ -9,5 +9,6 @@ import org.springframework.stereotype.Repository;
 public interface DonacionRepository extends JpaRepository<Donacion, Long> {
     List<Donacion> findAllByOrderByFechaRecepcionDesc();
     List<Donacion> findTop5ByOrderByFechaRecepcionDesc();
+    List<Donacion> findByFechaRecepcionBetweenOrderByFechaRecepcionDesc(java.time.LocalDate desde, java.time.LocalDate hasta);
     long countBy();
 }

@@ -1,5 +1,5 @@
 import apiClient from './api/axios';
-import type { InventarioMetricasResponse, Lote } from '../types/catalogs';
+import type { InventarioMetricasResponse, Lote, AlertaResumen } from '../types/catalogs';
 
 export interface BusquedaLotesParams {
   query?: string;
@@ -12,6 +12,11 @@ export interface BusquedaLotesParams {
 
 export const getMetricasInventario = async (): Promise<InventarioMetricasResponse> => {
   const { data } = await apiClient.get<InventarioMetricasResponse>('/v1/inventario/metricas');
+  return data;
+};
+
+export const getAlertas = async (): Promise<AlertaResumen[]> => {
+  const { data } = await apiClient.get<AlertaResumen[]>('/v1/inventario/alertas');
   return data;
 };
 

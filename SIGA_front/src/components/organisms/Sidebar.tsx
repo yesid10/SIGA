@@ -10,6 +10,8 @@ import {
   LuBoxes,
   LuClipboardList,
   LuHeart,
+  LuShieldAlert,
+  LuFileText,
 } from 'react-icons/lu'
 import type { IconType } from 'react-icons'
 import { useAuthStore } from '../../stores/authStore'
@@ -82,6 +84,18 @@ const navItems: NavItem[] = [
     label: 'Solicitudes',
     roles: ['ADMINISTRADOR', 'ENCARGADO', 'BENEFICIARIO'],
     icon: LuClipboardList,
+  },
+  {
+    to: '/alerts',
+    label: 'Alertas Vencimiento',
+    roles: ['ADMINISTRADOR', 'ENCARGADO'],
+    icon: LuShieldAlert,
+  },
+  {
+    to: '/reports',
+    label: 'Reportes e Informes',
+    roles: ['ADMINISTRADOR', 'ENCARGADO'],
+    icon: LuFileText,
   },
 ]
 

@@ -22,6 +22,10 @@ public interface LoteRepository extends JpaRepository<Lote, Long> {
 
     List<Lote> findByFechaVencimientoLessThanEqual(LocalDate fecha);
 
+    List<Lote> findByFechaVencimientoBeforeAndEstadoNot(LocalDate fecha, EstadoLote estado);
+
+    List<Lote> findByFechaVencimientoBetweenAndEstado(LocalDate inicio, LocalDate fin, EstadoLote estado);
+
     long countByEstado(EstadoLote estado);
 
     @Query("SELECT COUNT(l) FROM Lote l WHERE l.fechaVencimiento <= :fechaLimite AND l.estado = :estado")

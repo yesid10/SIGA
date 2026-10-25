@@ -121,27 +121,7 @@ public class InventarioService {
         // 11. Alertas recientes (lotes con <= 30 días ordenados por cercanía)
         List<AlertaResumen> alertasRecientes = todosLotes.stream()
                 .filter(l -> l.getCantidadDisponible().compareTo(BigDecimal.ZERO) > 0)
-                .map(l -> {
-                    long dias = ChronoUnit.DAYS.between(hoy, l.getFechaVencimiento());
-                    String urgencia;
-                    if (dias <= 1) {
-                        urgencia = "CRITICA";
-                    } else if (dias <= 3) {
-                        urgencia = "ALTA";
-                    } else if (dias <= 7) {
-                        urgencia = "MEDIA";
-                    } else {
-                        urgencia = "PREVENTIVA";
-                    }
-                    return new AlertaResumen(
-                            l.getId(),
-                            l.getNumeroLote(),
-                            l.getProducto().getNombre(),
-                            l.getFechaVencimiento().toString(),
-                            dias,
-                            urgencia
-                    );
-                })
+                .map(l -> mapearAlerta(l, hoy))
                 .filter(a -> a.diasRestantes() <= 30)
                 .sorted(Comparator.comparingLong(AlertaResumen::diasRestantes))
                 .limit(10)
@@ -215,5 +195,44 @@ public class InventarioService {
                 })
                 .map(LoteResponse::from)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<AlertaResumen> obtenerTodasLasAlertas() {
+        LocalDate hoy = LocalDate.now();
+        List<Lote> lotes = loteRepository.findAllByOrderByFechaVencimientoAsc();
+        return lotes.stream()
+                .filter(l -> l.getCantidadDisponible().compareTo(BigDecimal.ZERO) > 0)
+                .map(l -> mapearAlerta(l, hoy))
+                .filter(a -> a.diasRestantes() <= 30)
+                .sorted(Comparator.comparingLong(AlertaResumen::diasRestantes))
+                .toList();
+    }
+
+    private AlertaResumen mapearAlerta(Lote l, LocalDate hoy) {
+        long dias = ChronoUnit.DAYS.between(hoy, l.getFechaVencimiento());
+        String urgencia;
+        if (dias <= 1) {
+            urgencia = "CRITICA";
+        } else if (dias <= 3) {
+            urgencia = "ALTA";
+        } else if (dias <= 7) {
+            urgencia = "MEDIA";
+        } else {
+            urgencia = "PREVENTIVA";
+        }
+        return new AlertaResumen(
+                l.getId(),
+                l.getNumeroLote(),
+                l.getProducto().getNombre(),
+                l.getProducto().getCategoria() != null ? l.getProducto().getCategoria().getNombre() : "Sin categoría",
+                l.getUbicacion() != null ? l.getUbicacion().getNombre() : "Sin ubicación",
+                l.getCantidadDisponible(),
+                l.getUnidadMedida(),
+                l.getProducto().isEsPerecedero(),
+                l.getFechaVencimiento().toString(),
+                dias,
+                urgencia
+        );
     }
 }

@@ -1,5 +1,6 @@
 package com.SIGA.SIGA.controller;
 
+import com.SIGA.SIGA.dto.AlertaResumen;
 import com.SIGA.SIGA.dto.InventarioMetricasResponse;
 import com.SIGA.SIGA.dto.LoteResponse;
 import com.SIGA.SIGA.services.InventarioService;
@@ -25,6 +26,12 @@ public class InventarioController {
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENCARGADO', 'BENEFICIARIO')")
     public ResponseEntity<InventarioMetricasResponse> obtenerMetricas() {
         return ResponseEntity.ok(inventarioService.obtenerMetricas());
+    }
+
+    @GetMapping("/alertas")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENCARGADO')")
+    public ResponseEntity<List<AlertaResumen>> obtenerAlertas() {
+        return ResponseEntity.ok(inventarioService.obtenerTodasLasAlertas());
     }
 
     @GetMapping("/busqueda")

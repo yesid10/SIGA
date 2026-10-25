@@ -158,9 +158,48 @@ export interface AlertaResumen {
   loteId: number;
   numeroLote: string;
   productoNombre: string;
+  categoriaNombre?: string;
+  ubicacionNombre?: string;
+  cantidadDisponible?: number;
+  unidadMedida?: string;
+  esPerecedero?: boolean;
   fechaVencimiento: string;
   diasRestantes: number;
-  urgencia: string;
+  urgencia: 'CRITICA' | 'ALTA' | 'MEDIA' | 'PREVENTIVA' | string;
+}
+
+export interface ReporteCategoriaItem {
+  categoria: string;
+  kgRecibidos: number;
+  kgDistribuidos: number;
+  kgVencidos: number;
+}
+
+export interface ReporteDonanteItem {
+  donante: string;
+  totalDonaciones: number;
+  kgAportados: number;
+}
+
+export interface ReporteBeneficiarioItem {
+  beneficiario: string;
+  totalSolicitudes: number;
+  kgRecibidos: number;
+}
+
+export interface ReporteBalanceResponse {
+  desde: string;
+  hasta: string;
+  totalKgRecibidos: number;
+  totalKgDistribuidos: number;
+  totalKgVencidos: number;
+  totalKgDisponibles: number;
+  totalDonaciones: number;
+  totalSolicitudesAtendidas: number;
+  tasaAprovechamiento: number;
+  desgloseCategorias: ReporteCategoriaItem[];
+  desgloseDonantes: ReporteDonanteItem[];
+  desgloseBeneficiarios: ReporteBeneficiarioItem[];
 }
 
 export interface DonacionPorTipoEstadistica {

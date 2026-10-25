@@ -15,6 +15,8 @@ import { CategoriesPage } from "../pages/categories/CategoriesPage";
 import { DonationsPage } from "../pages/donations/DonationsPage";
 import { InventoryPage } from "../pages/inventory/InventoryPage";
 import { UsersPage } from "../pages/users/UsersPage";
+import { AlertsPage } from "../pages/alerts/AlertsPage";
+import { ReportsPage } from "../pages/reports/ReportsPage";
 
 export const AppRouter = () => {
   const user = useAuthStore((state) => state.user);
@@ -125,6 +127,22 @@ export const AppRouter = () => {
                 </DashboardTemplate>
               }
               path="/donations"
+            />
+            <Route
+              element={
+                <DashboardTemplate user={user!} onLogout={handleLogout}>
+                  <AlertsPage />
+                </DashboardTemplate>
+              }
+              path="/alerts"
+            />
+            <Route
+              element={
+                <DashboardTemplate user={user!} onLogout={handleLogout}>
+                  <ReportsPage />
+                </DashboardTemplate>
+              }
+              path="/reports"
             />
           </Route>
 
