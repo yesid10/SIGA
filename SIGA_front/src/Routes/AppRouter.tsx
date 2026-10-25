@@ -6,8 +6,9 @@ import { DashboardTemplate } from "../components/templates/DashboardTemplate";
 import { LoginPage } from "../pages/auth/LoginPage";
 import { RegisterPage } from "../pages/auth/RegisterPage";
 import { DashboardPage } from "../pages/dashboard/DashboardPage";
-import { PlaceholderPage } from "../pages/PlaceholderPage";
 import { ProductsPage } from "../pages/products/ProductsPage";
+import { RequestsPage } from "../pages/requests/RequestsPage";
+import { BeneficiariesPage } from "../pages/beneficiaries/BeneficiariesPage";
 import { LocationsPage } from "../pages/locations/LocationsPage";
 import { DonorsPage } from "../pages/donors/DonorsPage";
 import { CategoriesPage } from "../pages/categories/CategoriesPage";
@@ -62,10 +63,7 @@ export const AppRouter = () => {
           <Route
             element={
               <DashboardTemplate user={user!} onLogout={handleLogout}>
-                <PlaceholderPage
-                  title="Solicitudes"
-                  description="Consulta y gestiona solicitudes de alimentos."
-                />
+                <RequestsPage />
               </DashboardTemplate>
             }
             path="/requests"
@@ -80,6 +78,14 @@ export const AppRouter = () => {
               />
             }
           >
+            <Route
+              element={
+                <DashboardTemplate user={user!} onLogout={handleLogout}>
+                  <BeneficiariesPage />
+                </DashboardTemplate>
+              }
+              path="/beneficiaries"
+            />
             <Route
               element={
                 <DashboardTemplate user={user!} onLogout={handleLogout}>

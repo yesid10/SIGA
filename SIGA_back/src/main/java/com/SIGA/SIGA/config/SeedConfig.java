@@ -41,6 +41,8 @@ public class SeedConfig {
     private final DonanteRepository donanteRepository;
     private final DonacionRepository donacionRepository;
     private final LoteRepository loteRepository;
+    private final com.SIGA.SIGA.repository.BeneficiarioRepository beneficiarioRepository;
+    private final com.SIGA.SIGA.repository.SolicitudRepository solicitudRepository;
 
     @Value("${siga.seed.admin-email}")
     private String adminEmail;
@@ -196,6 +198,79 @@ public class SeedConfig {
 
                     donacionAlqueria.getLotes().addAll(List.of(loteLeche, loteYogurt));
                     donacionRepository.save(donacionAlqueria);
+                }
+            }
+
+            // 7. Semilla de Beneficiarios (RF-04: numPersonasHogar para priorización)
+            if (beneficiarioRepository.count() == 0) {
+                Usuario beneUser = usuarioRepository.findByEmailIgnoreCase("beneficiario@siga.org").orElse(null);
+
+                com.SIGA.SIGA.model.Beneficiario b1 = new com.SIGA.SIGA.model.Beneficiario(
+                        null, "901234567-8", "Fundación Manos Unidas", "beneficiario@siga.org",
+                        "3109876543", "Calle 34 # 18-24, Bucaramanga", 45, beneUser, true
+                );
+
+                com.SIGA.SIGA.model.Beneficiario b2 = new com.SIGA.SIGA.model.Beneficiario(
+                        null, "900876543-2", "Comedor Comunitario El Carmen", "comedor.carmen@gmail.com",
+                        "3187654321", "Carrera 9 # 12-40, Girón", 60, null, true
+                );
+
+                com.SIGA.SIGA.model.Beneficiario b3 = new com.SIGA.SIGA.model.Beneficiario(
+                        null, "1098712345", "Familia Gómez Pérez", "familia.gomez@gmail.com",
+                        "3154321098", "Barrio La Cumbre Mz C Casa 14, Floridablanca", 5, null, true
+                );
+
+                beneficiarioRepository.saveAll(List.of(b1, b2, b3));
+            }
+
+            // 8. Semilla de Solicitudes de Alimentos (RF-05 / CU-05)
+            if (solicitudRepository.count() == 0) {
+                com.SIGA.SIGA.model.Beneficiario fundacion = beneficiarioRepository.findByDocumento("901234567-8").orElse(null);
+                com.SIGA.SIGA.model.Beneficiario comedor = beneficiarioRepository.findByDocumento("900876543-2").orElse(null);
+                Usuario admin = usuarioRepository.findByEmailIgnoreCase(adminEmail).orElse(null);
+
+                Producto arroz = productoRepository.findByNombreIgnoreCase("Arroz Blanco 1kg").orElse(null);
+                Producto leche = productoRepository.findByNombreIgnoreCase("Leche Entera 1L").orElse(null);
+                Producto atun = productoRepository.findByNombreIgnoreCase("Atún en Aceite 170g").orElse(null);
+
+                if (fundacion != null && arroz != null && leche != null && atun != null) {
+                    com.SIGA.SIGA.model.Solicitud solPendiente = new com.SIGA.SIGA.model.Solicitud();
+                    solPendiente.setBeneficiario(fundacion);
+                    solPendiente.setFechaSolicitud(LocalDate.now());
+                    solPendiente.setEstado(com.SIGA.SIGA.model.EstadoSolicitud.PENDIENTE);
+                    solPendiente.setObservaciones("Atención prioritaria para 45 niños en jornada de la tarde.");
+
+                    com.SIGA.SIGA.model.DetalleSolicitud d1 = new com.SIGA.SIGA.model.DetalleSolicitud(
+                            null, solPendiente, arroz, new BigDecimal("25.00"), BigDecimal.ZERO
+                    );
+                    com.SIGA.SIGA.model.DetalleSolicitud d2 = new com.SIGA.SIGA.model.DetalleSolicitud(
+                            null, solPendiente, leche, new BigDecimal("15.00"), BigDecimal.ZERO
+                    );
+                    com.SIGA.SIGA.model.DetalleSolicitud d3 = new com.SIGA.SIGA.model.DetalleSolicitud(
+                            null, solPendiente, atun, new BigDecimal("20.00"), BigDecimal.ZERO
+                    );
+
+                    solPendiente.getDetalles().addAll(List.of(d1, d2, d3));
+                    solicitudRepository.save(solPendiente);
+                }
+
+                if (comedor != null && arroz != null && leche != null) {
+                    com.SIGA.SIGA.model.Solicitud solDespachada = new com.SIGA.SIGA.model.Solicitud();
+                    solDespachada.setBeneficiario(comedor);
+                    solDespachada.setFechaSolicitud(LocalDate.now().minusDays(3));
+                    solDespachada.setEstado(com.SIGA.SIGA.model.EstadoSolicitud.DESPACHADA);
+                    solDespachada.setUsuarioResponsable(admin);
+                    solDespachada.setObservaciones("Despacho quincenal entregado y verificado en sede.");
+
+                    com.SIGA.SIGA.model.DetalleSolicitud d1 = new com.SIGA.SIGA.model.DetalleSolicitud(
+                            null, solDespachada, arroz, new BigDecimal("30.00"), new BigDecimal("30.00")
+                    );
+                    com.SIGA.SIGA.model.DetalleSolicitud d2 = new com.SIGA.SIGA.model.DetalleSolicitud(
+                            null, solDespachada, leche, new BigDecimal("20.00"), new BigDecimal("20.00")
+                    );
+
+                    solDespachada.getDetalles().addAll(List.of(d1, d2));
+                    solicitudRepository.save(solDespachada);
                 }
             }
         };

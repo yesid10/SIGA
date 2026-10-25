@@ -188,3 +188,63 @@ export interface InventarioMetricasResponse {
   ultimasDonaciones: Donacion[];
   alertasRecientes: AlertaResumen[];
 }
+
+export interface Beneficiario {
+  id: number;
+  documento: string;
+  nombre: string;
+  email?: string | null;
+  telefono?: string | null;
+  direccion?: string | null;
+  numPersonasHogar: number;
+  usuarioId?: number | null;
+  activo: boolean;
+}
+
+export interface BeneficiarioRequest {
+  documento: string;
+  nombre: string;
+  email?: string;
+  telefono?: string;
+  direccion?: string;
+  numPersonasHogar: number;
+  usuarioId?: number | null;
+}
+
+export type EstadoSolicitud = 'PENDIENTE' | 'APROBADA' | 'DESPACHADA' | 'RECHAZADA' | 'CANCELADA';
+
+export interface DetalleSolicitud {
+  id: number;
+  productoId: number;
+  productoNombre: string;
+  categoriaNombre?: string;
+  unidadMedida: string;
+  esPerecedero: boolean;
+  cantidadSolicitada: number;
+  cantidadAsignada: number;
+}
+
+export interface Solicitud {
+  id: number;
+  beneficiarioId: number;
+  beneficiarioNombre: string;
+  beneficiarioDocumento: string;
+  numPersonasHogar: number;
+  fechaSolicitud: string;
+  estado: EstadoSolicitud;
+  usuarioResponsableEmail?: string | null;
+  observaciones?: string | null;
+  detalles: DetalleSolicitud[];
+  totalProductos: number;
+}
+
+export interface SolicitudItemRequest {
+  productoId: number;
+  cantidadSolicitada: number;
+}
+
+export interface SolicitudRequest {
+  beneficiarioId: number;
+  observaciones?: string;
+  items: SolicitudItemRequest[];
+}

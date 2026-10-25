@@ -9,6 +9,7 @@ import {
   LuTruck,
   LuBoxes,
   LuClipboardList,
+  LuHeart,
 } from 'react-icons/lu'
 import type { IconType } from 'react-icons'
 import { useAuthStore } from '../../stores/authStore'
@@ -63,6 +64,12 @@ const navItems: NavItem[] = [
     label: 'Donaciones',
     roles: ['ADMINISTRADOR', 'ENCARGADO'],
     icon: LuTruck,
+  },
+  {
+    to: '/beneficiaries',
+    label: 'Beneficiarios',
+    roles: ['ADMINISTRADOR', 'ENCARGADO'],
+    icon: LuHeart,
   },
   {
     to: '/inventory',
