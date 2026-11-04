@@ -1,198 +1,141 @@
 # SIGA - Sistema Inteligente de Gestión de Alimentos 🍎📦
 
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4%2B%20%2F%204.x-6DB33F?logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
-[![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)](https://react.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
-[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
+## 1. ¿De qué se trata el proyecto?
 
-**SIGA** es una plataforma integral diseñada para optimizar las operaciones de los **Bancos de Alimentos**, facilitando la recepción de donaciones, el almacenamiento técnico de víveres según su naturaleza perecedera o seca, la gestión de beneficiarios vulnerables y el **despacho automatizado con rotación FEFO (*First Expired, First Out*)**.
+**SIGA (Sistema Inteligente de Gestión de Alimentos)** es una solución web integral diseñada para optimizar y automatizar los procesos operativos de un **Banco de Alimentos**.
+
+El propósito principal del sistema es:
+
+- **Gestionar la entrada y trazabilidad de donaciones** realizadas por personas naturales o empresas.
+- **Controlar el almacenamiento técnico diferenciado** entre alimentos perecederos (cámaras refrigeradas) y alimentos no perecederos (estantes secos).
+- **Monitorear automáticamente las fechas de vencimiento** para evitar pérdidas y mermas alimentarias mediante un sistema de alertas por semáforo.
+- **Automatizar el despacho de alimentos mediante el algoritmo FEFO (_First Expired, First Out_)**, asignando con prioridad los lotes vigentes más próximos a vencer y excluyendo automáticamente cualquier lote caducado.
+- **Administrar los beneficiarios** (familias, fundaciones y comedores comunitarios), priorizando las entregas según su nivel de vulnerabilidad poblacional.
+- **Generar balances e informes estadísticos** de entradas versus salidas, con visualización gráfica y exportación a formato CSV.
 
 ---
 
-## ⚡ Levantamiento en 1 Solo Paso (Zero-Config)
+## 2. Tecnologías Manejadas
 
-> **¿Funciona el proyecto con un solo comando?**  
-> **¡SÍ!** Gracias a la configuración orquestada de Docker Compose y al componente de semillas (`SeedConfig`) del backend, no necesitas correr scripts SQL, crear esquemas manuales ni configurar usuarios iniciales. Al levantar los contenedores, la base de datos se crea, las tablas se generan y todos los datos semilla (usuarios, catálogo, lotes, ubicaciones y donaciones) se cargan automáticamente.
+El proyecto está construido bajo una arquitectura desacoplada de tres capas:
 
-### Requisitos previos
-- [Docker Engine](https://docs.docker.com/engine/install/) (v24+) y [Docker Compose](https://docs.docker.com/compose/) (v2+).
+- **Backend (API REST):**
+  - **Lenguaje:** Java 17.
+  - **Framework:** Spring Boot 4 / 3.4+.
+  - **Seguridad y Autenticación:** Spring Security 6, JWT (_JSON Web Tokens_ con biblioteca JJWT 0.12.x), BCrypt y Firebase Admin SDK (autenticación federada híbrida).
+  - **Persistencia de Datos:** Spring Data JPA con Hibernate 7.
+  - **Documentación API:** SpringDoc OpenAPI 3 / Swagger UI.
+  - **Pruebas:** JUnit 5 y Mockito.
 
-### Paso único
-En la raíz del proyecto, ejecuta:
+- **Frontend (Single Page Application):**
+  - **Librería Principal:** React 19.
+  - **Lenguaje:** TypeScript 5.
+  - **Herramienta de Construcción:** Vite 8.
+  - **Estilos y Diseño:** Tailwind CSS.
+  - **Manejo de Estado:** Zustand.
+  - **Visualización de Datos:** Recharts.
+  - **Iconografía:** React Icons (Lucide).
+
+- **Base de Datos:**
+  - **Motor:** PostgreSQL 16.
+
+- **Infraestructura y Despliegue:**
+  - **Contenedores:** Docker y Docker Compose (orquestación multicontenedor con _healthcheck_).
+  - **Servidor Web Frontend:** Nginx (servidor estático y proxy inverso hacia la API).
+
+---
+
+## 3. Requisitos y Programas que se Deben Tener Instalados
+
+Para desplegar y utilizar el sistema en cualquier máquina (Windows, macOS o Linux), se requiere tener instalado:
+
+1. **Docker Engine (versión 24 o superior) y Docker Compose (versión 2 o superior):**  
+   O en su defecto, **Docker Desktop** debidamente iniciado.
+2. **Git:** Para clonar el repositorio de código fuente.
+3. **Navegador Web:** Google Chrome, Mozilla Firefox, Microsoft Edge o Safari.
+4. **Puertos libres en el equipo:**
+   - Puerto `5173` (para la aplicación web Frontend).
+   - Puerto `8080` (para el Backend REST API).
+   - Puerto `5433` (para la base de datos PostgreSQL expuesta al host).
+
+---
+
+## 4. ¿Cómo se Levanta el Sistema? (Despliegue)
+
+El proyecto cuenta con configuración para levantarse **con un solo comando** gracias a Docker Compose y a las semillas automáticas del backend.
+
+### Paso 1: Clonar el repositorio
+
+Abre una terminal y clona el proyecto:
 
 ```bash
-docker compose up -d --build
+git clone https://github.com/yesid10/SIGA/tree/main
+cd SIGA
 ```
 
-*(O `docker compose up -d` si las imágenes ya fueron compiladas).*
+### Paso 2: Verificar el archivo de configuración `.env`
 
-Docker se encargará automáticamente de:
-1. Levantar **PostgreSQL 16** (`siga-db`) y verificar su salud interna con `pg_isready`.
-2. Compilar y arrancar la API **Spring Boot** (`siga-backend`), ejecutando la creación del esquema y la siembra de datos de prueba (`SeedConfig`).
-3. Compilar y servir la aplicación **React 19 + Vite** mediante **Nginx** (`siga-frontend`) con proxy inverso hacia el backend.
-
----
-
-## 🌐 URLs de Acceso y Credenciales Preconfiguradas
-
-Una vez levantados los contenedores, accede desde tu navegador:
-
-| Servicio | URL | Descripción |
-| :--- | :--- | :--- |
-| **Frontend Web** | [http://localhost:5173](http://localhost:5173) | Aplicación React SPA (o puerto configurado) |
-| **Backend API** | [http://localhost:8080](http://localhost:8080) | API REST Spring Boot |
-| **Swagger / OpenAPI** | [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html) | Documentación interactiva de endpoints |
-| **Base de Datos** | `localhost:5433` (externo) | PostgreSQL (`siga` / `siga-dev-password`) |
-
-### Cuentas Semilla Disponibles
-
-| Rol | Correo Electrónico | Contraseña | Permisos y Alcance |
-| :--- | :--- | :--- | :--- |
-| **Administrador** | `admin@siga.local` | `Admin123!` | Acceso total: donaciones, inventario, beneficiarios, reportes de balance y usuarios. |
-| **Encargado de Bodega** | `encargado@siga.org` | `Password123*` | Recepción de donaciones, gestión de ubicaciones, control de lotes y despacho FEFO. |
-| **Beneficiario** | `beneficiario@siga.org` | `Password123*` | Portal de autoservicio: consulta de cupos y creación de solicitudes de víveres. |
-
----
-
-## 🛠️ Módulos y Reglas de Negocio Implementadas
-
-### 1. Donaciones y Trazabilidad (RF01 - RF03)
-- Registro de donantes clasificados como **Empresas** (con NIT) o **Personas Naturales** (con Cédula).
-- Ingreso de remesas con asignación de código de lote, fecha de vencimiento y cantidad inicial.
-
-### 2. Almacenamiento Técnico y Capacidad (RF13 - RF14)
-- Diferenciación estricta de ubicaciones:
-  - **Cámaras Frigoríficas (`REFRIGERADO`):** Para lácteos, carnes y frutas perecederas.
-  - **Estantes y Pasillos (`SECO`):** Para granos, enlatados y pastas no perecederas.
-- Monitoreo en tiempo real de capacidad ocupada vs. capacidad máxima.
-
-### 3. Algoritmo de Despacho FEFO (*First Expired, First Out*) (RF05, RF07 - RF11)
-- Asignación automatizada de existencias priorizando los lotes vigentes **más próximos a su fecha de caducidad**.
-- **Seguridad alimentaria:** Exclusión automática de lotes caducados (`VENCIDO`) o agotados (`AGOTADO`).
-- **Consumo encadenado:** Si un lote no cubre la cantidad solicitada, consume el remanente del siguiente lote más próximo en cola FEFO.
-- **Entregas parciales (RF11):** Si el stock no cubre la totalidad, asigna las existencias disponibles y registra una nota en las observaciones.
-- Generación de traza de auditoría detallando qué lotes y cantidades fueron deducidos de bodega.
-
-### 4. Monitoreo Automatizado de Caducidad (RF06 / CP-05)
-- Tarea programada en segundo plano (`LoteSchedulerService`) que corre automáticamente a la medianoche y al iniciar la aplicación.
-- Actualización automática de estados (`PROXIMO_A_VENCER` para <= 30 días, `VENCIDO` para lotes cuya fecha ya expiró).
-- Tablero de alertas clasificado por severidad: **Crítica** (≤ 1 día), **Alta** (≤ 3 días), **Media** (≤ 7 días) y **Preventiva** (≤ 30 días).
-
-### 5. Beneficiarios y Priorización Social (RF04)
-- Registro de familias, fundaciones y comedores comunitarios con su respectivo documento de identidad.
-- Priorización basada en el número de personas a cargo en el hogar o institución asistida.
-
-### 6. Reportes de Balance y Estadísticas (RF16 / Figuras 3 y 5)
-- Balance consolidado de entradas (donaciones recibidas) vs. salidas (alimentos despachados).
-- Gráficas interactivas por categoría de producto, donantes con mayor aporte y beneficiarios atendidos.
-- Filtro por rango de fechas y exportación a formato **CSV**.
-
----
-
-## 📂 Estructura del Repositorio
-
-```text
-SIGA/
-├── docker-compose.yml          # Orquestación de Contenedores (db, backend, frontend)
-├── .env.example                # Plantilla unificada de variables de entorno
-├── README.md                   # Documentación general y guía de puesta en marcha
-│
-├── SIGA_back/                  # Backend Spring Boot (Java 17)
-│   ├── src/main/java/com/SIGA/SIGA/
-│   │   ├── config/             # Seguridad JWT, CORS y Semillas (SeedConfig.java)
-│   │   ├── controller/         # Controladores REST API
-│   │   ├── dto/                # Data Transfer Objects (Request / Response)
-│   │   ├── model/              # Entidades JPA (Donacion, Lote, Solicitud, Beneficiario, etc.)
-│   │   ├── repository/         # Interfaces Spring Data JPA y consultas JPQL FEFO
-│   │   └── services/           # Lógica de negocio (FEFO, Scheduler, Donaciones, etc.)
-│   ├── Dockerfile              # Empaquetado Docker multi-etapa
-│   └── pom.xml                 # Dependencias Maven
-│
-└── SIGA_front/                 # Frontend React 19 + TypeScript + Tailwind CSS
-    ├── src/
-    │   ├── components/         # Componentes atómicos (Botones, Badges, Tablas, etc.)
-    │   ├── pages/              # Vistas principales:
-    │   │   ├── alerts/         # Panel de Alertas de Vencimiento
-    │   │   ├── beneficiaries/  # Gestión de Beneficiarios
-    │   │   ├── dashboard/      # Métricas y KPIs de almacén
-    │   │   ├── donations/      # Recepción de Donaciones
-    │   │   ├── inventory/      # Búsqueda y trazabilidad de Lotes
-    │   │   ├── reports/        # Balance de Alimentos y Gráficas
-    │   │   └── requests/       # Bandeja de Solicitudes y Despacho FEFO
-    │   ├── services/           # Cliente Axios e integración de endpoints
-    │   └── stores/             # Estado global de autenticación (Zustand)
-    ├── Dockerfile              # Build Vite y despliegue Nginx
-    └── nginx.conf              # Configuración de proxy inverso
-```
-
----
-
-## 💻 Desarrollo Local (Sin Docker)
-
-Si prefieres ejecutar los componentes de manera nativa en tu máquina:
-
-### 1. Base de Datos
-Asegúrate de tener PostgreSQL 16 corriendo en el puerto `5433` (o ajusta la URL en `application.properties`):
-```bash
-docker run -d --name siga-db -p 5433:5432 -e POSTGRES_DB=siga -e POSTGRES_USER=siga -e POSTGRES_PASSWORD=siga-dev-password postgres:16-alpine
-```
-
-### 2. Backend
-```bash
-cd SIGA_back
-./mvnw clean spring-boot:run
-```
-*Las pruebas unitarias pueden ejecutarse con `./mvnw test`.*
-
-### 3. Frontend
-```bash
-cd SIGA_front
-npm install
-npm run dev
-```
-La aplicación quedará disponible en `http://localhost:5173`.
-
----
-
-## 🔒 Variables de Entorno
-
-El archivo `.env` en la raíz gobierna la configuración de Docker, Spring Boot y Vite. Para personalizar valores, crea una copia local:
+Asegúrate de que el archivo `.env` exista en la raíz del proyecto. Si no existe, créalo a partir de la plantilla:
 
 ```bash
 cp .env.example .env
 ```
 
-| Variable | Descripción | Valor por Defecto |
-| :--- | :--- | :--- |
-| `POSTGRES_DB` | Nombre de la base de datos | `siga` |
-| `POSTGRES_USER` | Usuario de base de datos | `siga` |
-| `POSTGRES_PASSWORD` | Contraseña de PostgreSQL | `siga-dev-password` |
-| `POSTGRES_PORT` | Puerto expuesto para la base de datos | `5433` |
-| `BACKEND_PORT` | Puerto HTTP para el backend | `8080` |
-| `FRONTEND_PORT` | Puerto HTTP para el frontend | `5173` |
-| `JWT_SECRET` | Clave secreta para firma de tokens JWT | *(Clave de desarrollo)* |
-| `SEED_ADMIN_EMAIL` | Correo del administrador inicial | `admin@siga.local` |
-| `SEED_ADMIN_PASSWORD` | Contraseña del administrador inicial | `Admin123!` |
-| `FIREBASE_ENABLED` | Integración opcional con Firebase Auth | `true` / `false` |
+_(El archivo `.env` unificado ya incluye todas las contraseñas, claves JWT y configuraciones por defecto necesarias para la base de datos y la semilla)._
+
+### Paso 3: Levantar los contenedores
+
+Ejecuta el siguiente comando en la raíz del proyecto:
+
+```bash
+docker compose up -d --build
+```
+
+Docker descargará/construirá las imágenes, levantará PostgreSQL 16 (`siga-db`), iniciará el backend Spring Boot (`siga-backend`) ejecutando la creación de tablas y la siembra automática de datos (`SeedConfig`), y pondrá en marcha el frontend Nginx (`siga-frontend`).
+
+### Paso 4: Acceso al sistema
+
+Una vez transcurridos aproximadamente 45 segundos, abre tu navegador e ingresa a:
+
+- **Frontend Web (Aplicación SIGA):** [http://localhost:5173](http://localhost:5173)
+- **Documentación Swagger / OpenAPI:** [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
+- **Backend API:** [http://localhost:8080/api/v1](http://localhost:8080/api/v1)
 
 ---
 
-## 🧪 Comandos Útiles
+## 5. ¿Cómo se Usa el Sistema?
 
-- **Ver logs en tiempo real:**
-  ```bash
-  docker compose logs -f
-  ```
-- **Reiniciar un servicio específico (ej. backend):**
-  ```bash
-  docker compose restart backend
-  ```
-- **Detener los contenedores conservando los datos:**
-  ```bash
-  docker compose down
-  ```
-- **Detener y limpiar volúmenes para reiniciar desde cero:**
-  ```bash
-  docker compose down -v
-  ```
+### Credenciales de Acceso Sembradas
+
+El sistema se inicializa automáticamente con tres cuentas de prueba con diferentes roles para su evaluación inmediata:
+
+| Rol                     | Correo Electrónico      | Contraseña     | Alcance de Permisos                                                                                       |
+| :---------------------- | :---------------------- | :------------- | :-------------------------------------------------------------------------------------------------------- |
+| **Administrador**       | `admin@siga.local`      | `Admin123!`    | Acceso completo: donaciones, inventario, beneficiarios, reportes de balance y administración de usuarios. |
+| **Encargado de Bodega** | `encargado@siga.org`    | `Password123*` | Operaciones de almacén: recepción de donaciones, gestión de lotes y ejecución del despacho con FEFO.      |
+| **Beneficiario**        | `beneficiario@siga.org` | `Password123*` | Portal de beneficiario: consulta de cupos asignados y creación de solicitudes de víveres.                 |
+
+---
+
+### Flujo de Uso por Módulos
+
+1. **Recepción de Alimentos (`/donations`):**
+   - El Encargado o Administrador registra una nueva donación indicando el donante (Empresa o Persona Natural).
+   - Se agregan los productos recibidos definiendo cantidad, unidad de medida, fecha de vencimiento y ubicación (Cámara Frigorífica si es perecedero o Estante si es seco).
+2. **Consulta y Trazabilidad de Inventario (`/inventory`):**
+   - Permite buscar lotes por nombre de producto, número de lote, donante o categoría.
+   - Visualiza en tiempo real los días restantes de vida útil y la cantidad disponible de cada lote.
+
+3. **Panel de Alertas de Vencimiento (`/alerts`):**
+   - Semáforo automático que clasifica los alimentos según su proximidad a caducar: **Crítica** (≤ 1 día), **Alta** (≤ 3 días), **Media** (≤ 7 días) y **Preventiva** (≤ 30 días).
+
+4. **Gestión de Beneficiarios (`/beneficiaries`):**
+   - Registro de familias u organizaciones receptoras con su documento de identidad y número de personas a cargo en el hogar para priorizar la distribución.
+
+5. **Bandeja de Solicitudes y Despacho FEFO (`/requests`):**
+   - **Crear Solicitud:** El beneficiario o administrador genera un pedido seleccionando los productos deseados (el sistema muestra en tiempo real el stock vigente disponible).
+   - **Despachar con FEFO:** El Encargado o Administrador hace clic en _"Despachar FEFO"_. El sistema selecciona automáticamente los lotes más próximos a caducar, descuenta las existencias físicas, marca los lotes consumidos como agotados y excluye lotes vencidos garantizando la inocuidad alimentaria.
+
+6. **Balance y Reportes (`/reports`):**
+   - El Administrador visualiza el balance de entradas (kilos/unidades donadas) versus salidas (víveres despachados).
+   - Incluye gráficos comparativos por categoría de alimentos, lista de principales donantes/beneficiarios y botón para exportar los datos a archivo **CSV**.
