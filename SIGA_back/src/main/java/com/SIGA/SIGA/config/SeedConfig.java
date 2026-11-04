@@ -193,12 +193,83 @@ public class SeedConfig {
                     donacionAlqueria.setObservaciones("Entrega refrigerada cadena de frío garantizada");
                     donacionAlqueria.setEstado(EstadoDonacion.RECIBIDA);
 
-                    Lote loteLeche = new Lote(null, "L-LEC-02", leche, donacionAlqueria, cam1, new BigDecimal("150.00"), new BigDecimal("150.00"), "litros", LocalDate.now().minusDays(2), LocalDate.now().plusDays(15), EstadoLote.DISPONIBLE, null);
-                    Lote loteYogurt = new Lote(null, "L-YOG-01", yogurt, donacionAlqueria, cam2, new BigDecimal("80.00"), new BigDecimal("80.00"), "litros", LocalDate.now().minusDays(2), LocalDate.now().plusDays(25), EstadoLote.DISPONIBLE, null);
+                    Lote loteLeche = new Lote(null, "L-LEC-02", leche, donacionAlqueria, cam1, new BigDecimal("150.00"), new BigDecimal("150.00"), "litros", LocalDate.now().minusDays(2), LocalDate.now().plusDays(15), EstadoLote.PROXIMO_A_VENCER, null);
+                    Lote loteYogurt = new Lote(null, "L-YOG-01", yogurt, donacionAlqueria, cam2, new BigDecimal("80.00"), new BigDecimal("80.00"), "litros", LocalDate.now().minusDays(2), LocalDate.now().plusDays(25), EstadoLote.PROXIMO_A_VENCER, null);
 
                     donacionAlqueria.getLotes().addAll(List.of(loteLeche, loteYogurt));
                     donacionRepository.save(donacionAlqueria);
                 }
+            }
+
+            // 6b. Garantizar cobertura de lotes vigentes para todos los productos del catálogo (Pruebas FEFO)
+            LocalDate hoy = LocalDate.now();
+            Usuario adminRef = usuarioRepository.findByEmailIgnoreCase(adminEmail).orElse(null);
+            Donante agro = donanteRepository.findByIdentificacion("800555333-8").orElse(null);
+            Donante alqueriaRef = donanteRepository.findByIdentificacion("890987654-3").orElse(null);
+            Donante exitoRef = donanteRepository.findByIdentificacion("900123456-1").orElse(null);
+
+            Ubicacion cam1Ref = ubicacionRepository.findByCodigoIgnoreCase("CAM-F01").orElse(null);
+            Ubicacion cam2Ref = ubicacionRepository.findByCodigoIgnoreCase("CAM-F02").orElse(null);
+            Ubicacion estARef = ubicacionRepository.findByCodigoIgnoreCase("EST-SEC-A").orElse(null);
+            Ubicacion estBRef = ubicacionRepository.findByCodigoIgnoreCase("EST-SEC-B").orElse(null);
+            Ubicacion bodGranosRef = ubicacionRepository.findByCodigoIgnoreCase("BOD-GRAN-01").orElse(null);
+
+            Producto lecheProd = productoRepository.findByNombreIgnoreCase("Leche Entera 1L").orElse(null);
+            if (lecheProd != null && loteRepository.findLotesDisponiblesParaFefo(lecheProd.getId(), hoy).isEmpty() && alqueriaRef != null && cam1Ref != null) {
+                Donacion donLeche = new Donacion(null, alqueriaRef, adminRef, hoy.minusDays(1), "Reposición refrigerada de leche pasteurizada para despacho FEFO", EstadoDonacion.RECIBIDA, new java.util.ArrayList<>(), null);
+                Lote l1 = new Lote(null, "L-LEC-03", lecheProd, donLeche, cam1Ref, new BigDecimal("180.00"), new BigDecimal("180.00"), "litros", hoy.minusDays(1), hoy.plusDays(10), EstadoLote.PROXIMO_A_VENCER, null);
+                Lote l2 = new Lote(null, "L-LEC-04", lecheProd, donLeche, cam1Ref, new BigDecimal("220.00"), new BigDecimal("220.00"), "litros", hoy, hoy.plusDays(24), EstadoLote.PROXIMO_A_VENCER, null);
+                donLeche.getLotes().addAll(List.of(l1, l2));
+                donacionRepository.save(donLeche);
+            }
+
+            Producto quesoProd = productoRepository.findByNombreIgnoreCase("Queso Campesino 500g").orElse(null);
+            if (quesoProd != null && loteRepository.findLotesDisponiblesParaFefo(quesoProd.getId(), hoy).isEmpty() && alqueriaRef != null && cam2Ref != null) {
+                Donacion donQueso = new Donacion(null, alqueriaRef, adminRef, hoy.minusDays(1), "Donación de derivados lácteos y carnes refrigeradas", EstadoDonacion.RECIBIDA, new java.util.ArrayList<>(), null);
+                Lote lQueso1 = new Lote(null, "L-QUE-01", quesoProd, donQueso, cam2Ref, new BigDecimal("60.00"), new BigDecimal("60.00"), "unidades", hoy.minusDays(1), hoy.plusDays(8), EstadoLote.PROXIMO_A_VENCER, null);
+                Lote lQueso2 = new Lote(null, "L-QUE-02", quesoProd, donQueso, cam2Ref, new BigDecimal("90.00"), new BigDecimal("90.00"), "unidades", hoy, hoy.plusDays(18), EstadoLote.PROXIMO_A_VENCER, null);
+                donQueso.getLotes().addAll(List.of(lQueso1, lQueso2));
+
+                Producto polloProd = productoRepository.findByNombreIgnoreCase("Pechuga de Pollo").orElse(null);
+                if (polloProd != null && cam1Ref != null) {
+                    Lote lPollo = new Lote(null, "L-POL-01", polloProd, donQueso, cam1Ref, new BigDecimal("75.00"), new BigDecimal("75.00"), "kg", hoy.minusDays(1), hoy.plusDays(6), EstadoLote.PROXIMO_A_VENCER, null);
+                    donQueso.getLotes().add(lPollo);
+                }
+                donacionRepository.save(donQueso);
+            }
+
+            Producto zanahoriaProd = productoRepository.findByNombreIgnoreCase("Zanahoria Fresca").orElse(null);
+            if (zanahoriaProd != null && loteRepository.findLotesDisponiblesParaFefo(zanahoriaProd.getId(), hoy).isEmpty() && agro != null && cam2Ref != null) {
+                Donacion donAgro = new Donacion(null, agro, adminRef, hoy.minusDays(1), "Cosecha fresca de frutas y hortalizas", EstadoDonacion.RECIBIDA, new java.util.ArrayList<>(), null);
+                Lote lZan = new Lote(null, "L-ZAN-01", zanahoriaProd, donAgro, cam2Ref, new BigDecimal("110.00"), new BigDecimal("110.00"), "kg", hoy.minusDays(1), hoy.plusDays(14), EstadoLote.PROXIMO_A_VENCER, null);
+                donAgro.getLotes().add(lZan);
+
+                Producto manzanaProd = productoRepository.findByNombreIgnoreCase("Manzana Roja").orElse(null);
+                if (manzanaProd != null) {
+                    Lote lManz = new Lote(null, "L-MAN-02", manzanaProd, donAgro, cam2Ref, new BigDecimal("85.00"), new BigDecimal("85.00"), "kg", hoy, hoy.plusDays(20), EstadoLote.PROXIMO_A_VENCER, null);
+                    donAgro.getLotes().add(lManz);
+                }
+                donacionRepository.save(donAgro);
+            }
+
+            Producto frijolProd = productoRepository.findByNombreIgnoreCase("Frijol Rojo 500g").orElse(null);
+            if (frijolProd != null && loteRepository.findLotesDisponiblesParaFefo(frijolProd.getId(), hoy).isEmpty() && exitoRef != null && bodGranosRef != null) {
+                Donacion donSecos = new Donacion(null, exitoRef, adminRef, hoy.minusDays(2), "Lote de leguminosas y pastas secas para despensa", EstadoDonacion.RECIBIDA, new java.util.ArrayList<>(), null);
+                Lote lFrijol = new Lote(null, "L-FRI-01", frijolProd, donSecos, bodGranosRef, new BigDecimal("160.00"), new BigDecimal("160.00"), "unidades", hoy.minusDays(2), hoy.plusMonths(8), EstadoLote.DISPONIBLE, null);
+                donSecos.getLotes().add(lFrijol);
+
+                Producto lentejaProd = productoRepository.findByNombreIgnoreCase("Lenteja Seleccionada 500g").orElse(null);
+                if (lentejaProd != null) {
+                    Lote lLent = new Lote(null, "L-LEN-01", lentejaProd, donSecos, bodGranosRef, new BigDecimal("140.00"), new BigDecimal("140.00"), "unidades", hoy.minusDays(2), hoy.plusMonths(9), EstadoLote.DISPONIBLE, null);
+                    donSecos.getLotes().add(lLent);
+                }
+
+                Producto spagProd = productoRepository.findByNombreIgnoreCase("Spaghetti 500g").orElse(null);
+                if (spagProd != null && estBRef != null) {
+                    Lote lSpag = new Lote(null, "L-SPA-01", spagProd, donSecos, estBRef, new BigDecimal("200.00"), new BigDecimal("200.00"), "paquetes", hoy.minusDays(2), hoy.plusMonths(10), EstadoLote.DISPONIBLE, null);
+                    donSecos.getLotes().add(lSpag);
+                }
+                donacionRepository.save(donSecos);
             }
 
             // 7. Semilla de Beneficiarios (RF-04: numPersonasHogar para priorización)

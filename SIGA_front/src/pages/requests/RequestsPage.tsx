@@ -30,12 +30,14 @@ import {
 } from '../../services/solicitudes';
 import { getBeneficiarios, getMiPerfilBeneficiario } from '../../services/beneficiarios';
 import { getProductos } from '../../services/productos';
+import { buscarLotes } from '../../services/inventario';
 import type {
   Solicitud,
   Beneficiario,
   Producto,
   SolicitudRequest,
   EstadoSolicitud,
+  Lote,
 } from '../../types/catalogs';
 
 interface TempItem {
@@ -46,6 +48,13 @@ interface TempItem {
   cantidadSolicitada: number;
 }
 
+interface StockProductoInfo {
+  disponible: number;
+  proximoLote: string | null;
+  proximoVencimiento: string | null;
+  stockVencido: number;
+}
+
 export const RequestsPage: React.FC = () => {
   const user = useAuthStore((state) => state.user);
   const isBeneficiario = user?.rol === 'BENEFICIARIO';
@@ -54,6 +63,7 @@ export const RequestsPage: React.FC = () => {
   const [solicitudes, setSolicitudes] = useState<Solicitud[]>([]);
   const [beneficiarios, setBeneficiarios] = useState<Beneficiario[]>([]);
   const [productos, setProductos] = useState<Producto[]>([]);
+  const [lotes, setLotes] = useState<Lote[]>([]);
   const [miPerfil, setMiPerfil] = useState<Beneficiario | null>(null);
 
   const [loading, setLoading] = useState(true);
@@ -67,6 +77,8 @@ export const RequestsPage: React.FC = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [detailSolicitud, setDetailSolicitud] = useState<Solicitud | null>(null);
   const [dispatchingSolicitud, setDispatchingSolicitud] = useState<Solicitud | null>(null);
+  const [dispatchError, setDispatchError] = useState<string | null>(null);
+  const [dispatchSuccessMsg, setDispatchSuccessMsg] = useState<string | null>(null);
   const [rejectingSolicitud, setRejectingSolicitud] = useState<Solicitud | null>(null);
   const [rejectMotivo, setRejectMotivo] = useState('');
 
@@ -82,12 +94,14 @@ export const RequestsPage: React.FC = () => {
   const cargarDatos = async () => {
     try {
       setRefreshing(true);
-      const [sols, prods] = await Promise.all([
+      const [sols, prods, lotesData] = await Promise.all([
         getSolicitudes(),
         getProductos(),
+        buscarLotes().catch(() => [] as Lote[]),
       ]);
       setSolicitudes(sols);
       setProductos(prods.filter((p) => p.activo));
+      setLotes(lotesData);
 
       if (isBeneficiario) {
         try {
@@ -109,6 +123,41 @@ export const RequestsPage: React.FC = () => {
       setRefreshing(false);
     }
   };
+
+  const stockPorProducto = useMemo<Record<number, StockProductoInfo>>(() => {
+    const map: Record<number, StockProductoInfo> = {};
+    for (const prod of productos) {
+      map[prod.id] = {
+        disponible: 0,
+        proximoLote: null,
+        proximoVencimiento: null,
+        stockVencido: 0,
+      };
+    }
+    for (const lote of lotes) {
+      if (!map[lote.productoId]) {
+        map[lote.productoId] = {
+          disponible: 0,
+          proximoLote: null,
+          proximoVencimiento: null,
+          stockVencido: 0,
+        };
+      }
+      const cant = Number(lote.cantidadDisponible) || 0;
+      if (cant <= 0) continue;
+
+      if (lote.estado === 'VENCIDO' || (lote.diasRestantes ?? 0) < 0) {
+        map[lote.productoId].stockVencido += cant;
+      } else if (lote.estado !== 'AGOTADO') {
+        map[lote.productoId].disponible += cant;
+        if (!map[lote.productoId].proximoLote) {
+          map[lote.productoId].proximoLote = lote.numeroLote;
+          map[lote.productoId].proximoVencimiento = lote.fechaVencimiento;
+        }
+      }
+    }
+    return map;
+  }, [productos, lotes]);
 
   useEffect(() => {
     cargarDatos();
@@ -216,16 +265,25 @@ export const RequestsPage: React.FC = () => {
 
   const handleDespacharConFefo = async () => {
     if (!dispatchingSolicitud) return;
+    setDispatchError(null);
+    setDispatchSuccessMsg(null);
     try {
       setSubmitting(true);
-      await despacharSolicitud(dispatchingSolicitud.id);
+      const resultado = await despacharSolicitud(dispatchingSolicitud.id);
       setDispatchingSolicitud(null);
+      const resumenAsignado = resultado.detalles
+        .map((d) => `${d.productoNombre}: ${d.cantidadAsignada}/${d.cantidadSolicitada} ${d.unidadMedida}`)
+        .join(' | ');
+      setDispatchSuccessMsg(
+        `Solicitud #${resultado.id} despachada con éxito aplicando FEFO (${resumenAsignado}).`
+      );
       await cargarDatos();
     } catch (err: unknown) {
       const errorMsg =
         (err as { response?: { data?: { mensaje?: string; error?: string } } })?.response?.data?.mensaje ||
+        (err as { response?: { data?: { error?: string } } })?.response?.data?.error ||
         'Error al realizar el despacho FEFO.';
-      alert(errorMsg);
+      setDispatchError(errorMsg);
     } finally {
       setSubmitting(false);
     }
@@ -363,6 +421,23 @@ export const RequestsPage: React.FC = () => {
           <div className="text-sm text-amber-800">
             <span className="font-bold">Aviso de Perfil:</span> Tu cuenta aún no tiene un registro de beneficiario vinculado. Comunícate con el administrador para vincular tu documento de identidad y registrar el número de personas en tu hogar.
           </div>
+        </div>
+      )}
+
+      {/* Success Banner on FEFO Dispatch */}
+      {dispatchSuccessMsg && (
+        <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 text-sm text-emerald-900">
+            <LuCircleCheck className="w-5 h-5 text-emerald-600 shrink-0" />
+            <span>{dispatchSuccessMsg}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setDispatchSuccessMsg(null)}
+            className="text-emerald-600 hover:text-emerald-800 p-1 rounded cursor-pointer"
+          >
+            <LuX className="w-4 h-4" />
+          </button>
         </div>
       )}
 
@@ -557,7 +632,10 @@ export const RequestsPage: React.FC = () => {
                           <>
                             <button
                               type="button"
-                              onClick={() => setDispatchingSolicitud(s)}
+                              onClick={() => {
+                                setDispatchError(null);
+                                setDispatchingSolicitud(s);
+                              }}
                               className="px-2.5 py-1 text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white rounded-md transition-colors flex items-center gap-1 cursor-pointer shadow-sm"
                               title="Despachar asignando existencias con FEFO"
                             >
@@ -647,7 +725,7 @@ export const RequestsPage: React.FC = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
                   <div className="sm:col-span-7">
                     <label className="block text-xs font-medium text-slate-600 mb-1">
-                      Producto Disponible
+                      Producto y Stock Vigente (FEFO)
                     </label>
                     <select
                       value={itemProductoId}
@@ -655,11 +733,16 @@ export const RequestsPage: React.FC = () => {
                       className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer"
                     >
                       <option value="">Selecciona un producto...</option>
-                      {productos.map((p) => (
-                        <option key={p.id} value={p.id}>
-                          {p.nombre} ({p.unidadMedida}) {p.esPerecedero ? '❄ Perecedero' : 'Seco'}
-                        </option>
-                      ))}
+                      {productos.map((p) => {
+                        const info = stockPorProducto[p.id];
+                        const disp = info?.disponible ?? 0;
+                        return (
+                          <option key={p.id} value={p.id}>
+                            {p.nombre} ({p.unidadMedida}) — Stock FEFO: {disp} {p.unidadMedida}
+                            {disp === 0 ? ' [SIN STOCK VIGENTE]' : ''}
+                          </option>
+                        );
+                      })}
                     </select>
                   </div>
                   <div className="sm:col-span-3">
@@ -688,6 +771,22 @@ export const RequestsPage: React.FC = () => {
                     </Button>
                   </div>
                 </div>
+                {itemProductoId !== '' && stockPorProducto[Number(itemProductoId)] && (
+                  <div className="text-xs flex items-center justify-between pt-1 text-slate-600">
+                    <span>
+                      Disponible en lotes vigentes:{' '}
+                      <strong className={stockPorProducto[Number(itemProductoId)].disponible > 0 ? 'text-emerald-700' : 'text-red-600'}>
+                        {stockPorProducto[Number(itemProductoId)].disponible}{' '}
+                        {productos.find((p) => p.id === Number(itemProductoId))?.unidadMedida}
+                      </strong>
+                    </span>
+                    {stockPorProducto[Number(itemProductoId)].proximoLote && (
+                      <span className="text-slate-500">
+                        Próximo lote FEFO: <strong>{stockPorProducto[Number(itemProductoId)].proximoLote}</strong> (vence {stockPorProducto[Number(itemProductoId)].proximoVencimiento})
+                      </span>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Basket list */}
@@ -701,24 +800,33 @@ export const RequestsPage: React.FC = () => {
                   </p>
                 ) : (
                   <div className="border border-slate-200 rounded-lg divide-y divide-slate-100 max-h-48 overflow-y-auto">
-                    {items.map((item, idx) => (
-                      <div key={idx} className="flex items-center justify-between p-2.5 text-sm">
-                        <div className="flex items-center gap-2">
-                          <LuPackage className="w-4 h-4 text-emerald-600" />
-                          <span className="font-semibold text-slate-800">{item.productoNombre}</span>
-                          <span className="text-xs text-slate-500">
-                            ({item.cantidadSolicitada} {item.unidadMedida})
-                          </span>
+                    {items.map((item, idx) => {
+                      const disp = stockPorProducto[item.productoId]?.disponible ?? 0;
+                      const excede = item.cantidadSolicitada > disp;
+                      return (
+                        <div key={idx} className="flex items-center justify-between p-2.5 text-sm">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <LuPackage className="w-4 h-4 text-emerald-600" />
+                            <span className="font-semibold text-slate-800">{item.productoNombre}</span>
+                            <span className="text-xs text-slate-500">
+                              (Solicitado: {item.cantidadSolicitada} {item.unidadMedida} | Disponible FEFO: {disp} {item.unidadMedida})
+                            </span>
+                            {excede && (
+                              <span className="text-[11px] px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 font-semibold">
+                                Stock parcial disponible
+                              </span>
+                            )}
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveItem(idx)}
+                            className="p-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded cursor-pointer"
+                          >
+                            <LuTrash2 className="w-4 h-4" />
+                          </button>
                         </div>
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveItem(idx)}
-                          className="p-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded cursor-pointer"
-                        >
-                          <LuTrash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -764,7 +872,7 @@ export const RequestsPage: React.FC = () => {
       {/* Modal: Confirmar Despacho FEFO */}
       {dispatchingSolicitud && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden border border-slate-200">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-xl overflow-hidden border border-slate-200">
             <div className="p-6">
               <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mb-4">
                 <LuTruck className="w-6 h-6" />
@@ -772,16 +880,71 @@ export const RequestsPage: React.FC = () => {
               <h3 className="text-lg font-bold text-slate-900">
                 Aprobar y Despachar con FEFO
               </h3>
-              <p className="text-sm text-slate-600 mt-2">
-                Estás a punto de despachar la Solicitud <span className="font-bold text-slate-900">#{dispatchingSolicitud.id}</span> para <span className="font-semibold text-slate-900">{dispatchingSolicitud.beneficiarioNombre}</span> ({dispatchingSolicitud.numPersonasHogar} personas).
+              <p className="text-sm text-slate-600 mt-1">
+                Solicitud <span className="font-bold text-slate-900">#{dispatchingSolicitud.id}</span> para{' '}
+                <span className="font-semibold text-slate-900">{dispatchingSolicitud.beneficiarioNombre}</span> ({dispatchingSolicitud.numPersonasHogar} personas).
               </p>
+
+              {dispatchError && (
+                <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg flex items-start gap-2 text-xs text-red-800">
+                  <LuTriangleAlert className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
+                  <span>{dispatchError}</span>
+                </div>
+              )}
+
+              {/* Preview of FEFO Assignment per Item */}
+              <div className="mt-4 border border-slate-200 rounded-lg overflow-hidden">
+                <table className="min-w-full divide-y divide-slate-200 text-left text-xs">
+                  <thead className="bg-slate-50 text-slate-600 font-semibold uppercase">
+                    <tr>
+                      <th className="px-3 py-2">Producto</th>
+                      <th className="px-3 py-2">Solicitado</th>
+                      <th className="px-3 py-2">Stock FEFO Vigente</th>
+                      <th className="px-3 py-2">Lote Prioritario</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 bg-white">
+                    {dispatchingSolicitud.detalles.map((d) => {
+                      const info = stockPorProducto[d.productoId];
+                      const disp = info?.disponible ?? 0;
+                      const asignable = Math.min(d.cantidadSolicitada, disp);
+                      return (
+                        <tr key={d.id}>
+                          <td className="px-3 py-2 font-semibold text-slate-900">{d.productoNombre}</td>
+                          <td className="px-3 py-2 text-slate-700">
+                            {d.cantidadSolicitada} {d.unidadMedida}
+                          </td>
+                          <td className="px-3 py-2">
+                            <span className={`font-bold ${disp >= d.cantidadSolicitada ? 'text-emerald-700' : disp > 0 ? 'text-amber-700' : 'text-red-600'}`}>
+                              {disp} {d.unidadMedida} (Asignará: {asignable})
+                            </span>
+                          </td>
+                          <td className="px-3 py-2 text-slate-600">
+                            {info?.proximoLote ? (
+                              <span>
+                                <strong>{info.proximoLote}</strong> ({info.proximoVencimiento})
+                              </span>
+                            ) : (
+                              <span className="text-red-600 font-medium">Sin lote vigente</span>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+
               <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-900 leading-relaxed">
-                <span className="font-bold">Algoritmo FEFO (First Expired, First Out):</span> El sistema buscará de manera automática los lotes de cada producto con la fecha de vencimiento más próxima, descontando el inventario físico disponible para prevenir mermas.
+                <span className="font-bold">Algoritmo FEFO (First Expired, First Out):</span> El sistema descontará automáticamente las existencias de los lotes vigentes con la fecha de vencimiento más próxima, excluyendo lotes vencidos por seguridad alimentaria.
               </div>
               <div className="flex items-center justify-end gap-3 mt-6">
                 <Button
                   variant="outline"
-                  onClick={() => setDispatchingSolicitud(null)}
+                  onClick={() => {
+                    setDispatchError(null);
+                    setDispatchingSolicitud(null);
+                  }}
                   disabled={submitting}
                   className="cursor-pointer"
                 >

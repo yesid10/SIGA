@@ -97,7 +97,7 @@ public class SolicitudService {
 
     /**
      * Algoritmo de Despacho FEFO (First Expired, First Out)
-     * Descuenta automáticamente las existencias de los lotes más próximos a vencer.
+     * Descuenta automáticamente las existencias de los lotes vigentes más próximos a vencer.
      */
     @Transactional
     public SolicitudResponse despacharConFefo(Long solicitudId, String emailEncargado) {
@@ -113,12 +113,18 @@ public class SolicitudService {
         Usuario encargado = usuarioRepository.findByEmailIgnoreCase(emailEncargado)
                 .orElse(null);
 
+        LocalDate hoy = LocalDate.now();
+        BigDecimal totalAsignadoGlobal = BigDecimal.ZERO;
+        List<String> trazaLotes = new ArrayList<>();
+        List<String> productosSinStock = new ArrayList<>();
+        boolean huboAsignacionParcial = false;
+
         for (DetalleSolicitud detalle : solicitud.getDetalles()) {
             BigDecimal cantidadPendiente = detalle.getCantidadSolicitada();
             BigDecimal cantidadAsignada = BigDecimal.ZERO;
 
-            // Buscar lotes disponibles del producto ordenados por fecha de vencimiento ASC (FEFO)
-            List<Lote> lotesFefo = loteRepository.findLotesDisponiblesParaFefo(detalle.getProducto().getId());
+            // Buscar lotes vigentes disponibles del producto ordenados por fecha de vencimiento ASC (FEFO)
+            List<Lote> lotesFefo = loteRepository.findLotesDisponiblesParaFefo(detalle.getProducto().getId(), hoy);
 
             for (Lote lote : lotesFefo) {
                 if (cantidadPendiente.compareTo(BigDecimal.ZERO) <= 0) {
@@ -130,28 +136,68 @@ public class SolicitudService {
                     continue;
                 }
 
+                BigDecimal descontadoDeLote;
                 if (disponible.compareTo(cantidadPendiente) <= 0) {
                     // El lote se consume por completo
+                    descontadoDeLote = disponible;
                     cantidadAsignada = cantidadAsignada.add(disponible);
                     cantidadPendiente = cantidadPendiente.subtract(disponible);
                     lote.setCantidadDisponible(BigDecimal.ZERO);
                     lote.setEstado(EstadoLote.AGOTADO);
                 } else {
                     // El lote cubre lo restante
+                    descontadoDeLote = cantidadPendiente;
                     lote.setCantidadDisponible(disponible.subtract(cantidadPendiente));
                     cantidadAsignada = cantidadAsignada.add(cantidadPendiente);
                     cantidadPendiente = BigDecimal.ZERO;
+
+                    long diasRestantes = java.time.temporal.ChronoUnit.DAYS.between(hoy, lote.getFechaVencimiento());
+                    lote.setEstado(diasRestantes <= 30 ? EstadoLote.PROXIMO_A_VENCER : EstadoLote.DISPONIBLE);
                 }
 
-                loteRepository.save(lote);
+                loteRepository.saveAndFlush(lote);
+                trazaLotes.add(String.format("%s: Lote %s (-%s %s, vence %s)",
+                        detalle.getProducto().getNombre(),
+                        lote.getNumeroLote(),
+                        descontadoDeLote.stripTrailingZeros().toPlainString(),
+                        detalle.getProducto().getUnidadMedida(),
+                        lote.getFechaVencimiento()));
             }
 
             detalle.setCantidadAsignada(cantidadAsignada);
+            totalAsignadoGlobal = totalAsignadoGlobal.add(cantidadAsignada);
+
+            if (cantidadAsignada.compareTo(BigDecimal.ZERO) == 0) {
+                productosSinStock.add(detalle.getProducto().getNombre());
+            } else if (cantidadAsignada.compareTo(detalle.getCantidadSolicitada()) < 0) {
+                huboAsignacionParcial = true;
+            }
+        }
+
+        if (totalAsignadoGlobal.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new ReglaNegocioException(
+                    "No hay lotes vigentes con stock disponible en bodega para despachar: "
+                            + String.join(", ", productosSinStock)
+                            + ". (Nota: los lotes vencidos o agotados son excluidos automáticamente por seguridad alimentaria FEFO)."
+            );
+        }
+
+        String notaFefo = "Despacho FEFO [" + String.join("; ", trazaLotes) + "]";
+        if (huboAsignacionParcial || !productosSinStock.isEmpty()) {
+            notaFefo += " (Entrega parcial sujeta a stock vigente disponible - RF11)";
+        }
+
+        String obsBase = solicitud.getObservaciones();
+        if (obsBase == null || obsBase.isBlank()) {
+            solicitud.setObservaciones(notaFefo);
+        } else if (!obsBase.contains("Despacho FEFO [")) {
+            String nuevaObs = obsBase.trim() + " | " + notaFefo;
+            solicitud.setObservaciones(nuevaObs.length() > 500 ? nuevaObs.substring(0, 497) + "..." : nuevaObs);
         }
 
         solicitud.setEstado(EstadoSolicitud.DESPACHADA);
         solicitud.setUsuarioResponsable(encargado);
-        return SolicitudResponse.from(solicitudRepository.save(solicitud));
+        return SolicitudResponse.from(solicitudRepository.saveAndFlush(solicitud));
     }
 
     @Transactional

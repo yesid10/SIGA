@@ -31,6 +31,13 @@ public interface LoteRepository extends JpaRepository<Lote, Long> {
     @Query("SELECT COUNT(l) FROM Lote l WHERE l.fechaVencimiento <= :fechaLimite AND l.estado = :estado")
     long countProximosAVencer(@Param("fechaLimite") LocalDate fechaLimite, @Param("estado") EstadoLote estado);
 
-    @Query("SELECT l FROM Lote l WHERE l.producto.id = :productoId AND l.cantidadDisponible > 0 AND l.estado != 'VENCIDO' AND l.estado != 'AGOTADO' ORDER BY l.fechaVencimiento ASC")
-    List<Lote> findLotesDisponiblesParaFefo(@Param("productoId") Long productoId);
+    @Query("""
+            SELECT l FROM Lote l
+            WHERE l.producto.id = :productoId
+              AND l.cantidadDisponible > 0
+              AND l.estado NOT IN (com.SIGA.SIGA.model.EstadoLote.VENCIDO, com.SIGA.SIGA.model.EstadoLote.AGOTADO)
+              AND l.fechaVencimiento >= :hoy
+            ORDER BY l.fechaVencimiento ASC, l.id ASC
+            """)
+    List<Lote> findLotesDisponiblesParaFefo(@Param("productoId") Long productoId, @Param("hoy") LocalDate hoy);
 }
