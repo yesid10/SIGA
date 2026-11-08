@@ -1,0 +1,16 @@
+info:
+  name: UDS2
+  type: http
+
+http:
+  method: GET
+  url: https://ghost-kitchen-nusq.onrender.com/api/v1/informes/
+  auth:
+    type: bearer
+    token: QkwVBVttNYjyshnyoRv3z9QiP7uso5ZQD_kzadrWU6k
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -1,0 +1,19 @@
+info:
+  name: Obtener Productos SIGA (Integracion UDS)
+  type: http
+
+http:
+  method: GET
+  url: http://localhost:8080/api/v1/external/productos
+  headers:
+    - name: X-API-KEY
+      value: siga-uds-external-access-key-2026
+  auth:
+    type: bearer
+    token: QkwVBVttNYjyshnyoRv3z9QiP7uso5ZQD_kzadrWU6k
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

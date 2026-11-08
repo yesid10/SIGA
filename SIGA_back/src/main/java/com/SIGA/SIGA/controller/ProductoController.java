@@ -26,7 +26,7 @@ public class ProductoController {
 
     private final ProductoService productoService;
 
-    @GetMapping
+    @GetMapping({"", "/"})
     public ResponseEntity<List<ProductoResponse>> listar(
             @RequestParam(required = false) Long categoriaId,
             @RequestParam(required = false) Boolean esPerecedero) {

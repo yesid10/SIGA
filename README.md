@@ -139,3 +139,10 @@ El sistema se inicializa automáticamente con tres cuentas de prueba con diferen
 6. **Balance y Reportes (`/reports`):**
    - El Administrador visualiza el balance de entradas (kilos/unidades donadas) versus salidas (víveres despachados).
    - Incluye gráficos comparativos por categoría de alimentos, lista de principales donantes/beneficiarios y botón para exportar los datos a archivo **CSV**.
+
+7. **Integración Externa M2M (Consumo por Ghost Kitchen / Otra UDS):**
+   - Permite que sistemas aliados (como Ghost Kitchen: `https://ghost-kitchen-nusq.onrender.com`) consulten el catálogo de productos con su stock real vigente.
+   - **Endpoint:** `GET /api/v1/external/productos` (o `GET /api/v1/productos`).
+   - **Cabecera requerida:** `X-API-KEY: siga-uds-external-access-key-2026`.
+   - **Permisos:** Estrictamente lectura (`GET`). Cualquier intento de modificación (`POST`, `PUT`, `DELETE`) es denegado con HTTP 403 Forbidden.
+   - **CORS Habilitado:** Configurado para aceptar peticiones desde `https://ghost-kitchen-nusq.onrender.com` y orígenes autorizados.
