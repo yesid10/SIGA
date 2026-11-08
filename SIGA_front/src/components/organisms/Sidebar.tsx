@@ -12,6 +12,7 @@ import {
   LuHeart,
   LuShieldAlert,
   LuFileText,
+  LuUtensilsCrossed,
 } from 'react-icons/lu'
 import type { IconType } from 'react-icons'
 import { useAuthStore } from '../../stores/authStore'
@@ -84,6 +85,12 @@ const navItems: NavItem[] = [
     label: 'Solicitudes',
     roles: ['ADMINISTRADOR', 'ENCARGADO', 'BENEFICIARIO'],
     icon: LuClipboardList,
+  },
+  {
+    to: '/ghost-kitchen',
+    label: 'UDS: Ghost Kitchen',
+    roles: ['ADMINISTRADOR', 'ENCARGADO', 'BENEFICIARIO'],
+    icon: LuUtensilsCrossed,
   },
   {
     to: '/alerts',

@@ -28,7 +28,9 @@ services:
       DB_PASSWORD: ${POSTGRES_PASSWORD:-siga}
       JWT_SECRET: ${JWT_SECRET:-change-this-secret-in-development-minimum-32-characters}
       JWT_EXPIRATION_MS: ${JWT_EXPIRATION_MS:-3600000}
-      EXTERNAL_API_KEY: ${EXTERNAL_API_KEY:-siga-uds-external-access-key-2026}
+      EXTERNAL_API_KEY: ${EXTERNAL_API_KEY:-siga-uds-external-access-key-2026,QkwVBVttNYjyshnyoRv3z9QiP7uso5ZQD_kzadrWU6k}
+      GHOST_KITCHEN_URL: ${GHOST_KITCHEN_URL:-https://ghost-kitchen-nusq.onrender.com/api/v1/informes/}
+      GHOST_KITCHEN_TOKEN: ${GHOST_KITCHEN_TOKEN:-QkwVBVttNYjyshnyoRv3z9QiP7uso5ZQD_kzadrWU6k}
       CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:5173,http://localhost:8080,https://ghost-kitchen-nusq.onrender.com}
       SEED_ADMIN_EMAIL: ${SEED_ADMIN_EMAIL:-admin@siga.local}
       SEED_ADMIN_PASSWORD: ${SEED_ADMIN_PASSWORD:-Admin123!}

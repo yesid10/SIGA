@@ -17,6 +17,7 @@ import { InventoryPage } from "../pages/inventory/InventoryPage";
 import { UsersPage } from "../pages/users/UsersPage";
 import { AlertsPage } from "../pages/alerts/AlertsPage";
 import { ReportsPage } from "../pages/reports/ReportsPage";
+import { GhostKitchenPage } from "../pages/ghost-kitchen/GhostKitchenPage";
 
 export const AppRouter = () => {
   const user = useAuthStore((state) => state.user);
@@ -69,6 +70,14 @@ export const AppRouter = () => {
               </DashboardTemplate>
             }
             path="/requests"
+          />
+          <Route
+            element={
+              <DashboardTemplate user={user!} onLogout={handleLogout}>
+                <GhostKitchenPage />
+              </DashboardTemplate>
+            }
+            path="/ghost-kitchen"
           />
 
           {/* Rutas operativas: solo para Administradores y Encargados */}

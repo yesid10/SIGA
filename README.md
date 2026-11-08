@@ -140,9 +140,12 @@ El sistema se inicializa automáticamente con tres cuentas de prueba con diferen
    - El Administrador visualiza el balance de entradas (kilos/unidades donadas) versus salidas (víveres despachados).
    - Incluye gráficos comparativos por categoría de alimentos, lista de principales donantes/beneficiarios y botón para exportar los datos a archivo **CSV**.
 
-7. **Integración Externa M2M (Consumo por Ghost Kitchen / Otra UDS):**
-   - Permite que sistemas aliados (como Ghost Kitchen: `https://ghost-kitchen-nusq.onrender.com`) consulten el catálogo de productos con su stock real vigente.
-   - **Endpoint:** `GET /api/v1/external/productos` (o `GET /api/v1/productos`).
-   - **Cabecera requerida:** `X-API-KEY: siga-uds-external-access-key-2026`.
-   - **Permisos:** Estrictamente lectura (`GET`). Cualquier intento de modificación (`POST`, `PUT`, `DELETE`) es denegado con HTTP 403 Forbidden.
-   - **CORS Habilitado:** Configurado para aceptar peticiones desde `https://ghost-kitchen-nusq.onrender.com` y orígenes autorizados.
+7. **Integración Externa M2M (Bidireccional con Ghost Kitchen / Otra UDS):**
+   - **Consumo de SIGA hacia la UDS Externa:**
+     - Endpoint: `GET /api/v1/external/productos` (o `GET /api/v1/productos`).
+     - Cabeceras aceptadas: `X-API-KEY: siga-uds-external-access-key-2026` o `Authorization: Bearer QkwVBVttNYjyshnyoRv3z9QiP7uso5ZQD_kzadrWU6k`.
+     - Permisos: Estrictamente lectura (`GET`). Cualquier intento de mutación es denegado con HTTP 403 Forbidden.
+     - CORS Habilitado: `https://ghost-kitchen-nusq.onrender.com`.
+   - **Consumo de la UDS Externa en SIGA (Módulo Frontend y BFF):**
+     - Endpoint backend BFF: `GET /api/v1/integracion/ghost-kitchen/productos`.
+     - Módulo Frontend: Vista interactiva en `/ghost-kitchen` accesible desde la barra lateral (`UDS: Ghost Kitchen`), con filtros de categoría, stock en tiempo real, precios en COP y modal de detalle.
