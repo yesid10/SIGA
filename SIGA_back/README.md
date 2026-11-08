@@ -24,11 +24,17 @@ docker compose up --build
 
 Para ejecutar el backend directamente, define estas variables en `.env` o en el entorno:
 
-- `DB_URL`
-- `DB_USERNAME`
-- `DB_PASSWORD`
+- `PGHOST`
+- `PGDATABASE`
+- `PGUSER`
+- `PGPASSWORD`
+- `PGSSLMODE`
+- `PGCHANNELBINDING`
 - `JWT_SECRET`
 - `JWT_EXPIRATION_MS`
+- `EXTERNAL_API_KEY`
+- `GHOST_KITCHEN_URL`
+- `GHOST_KITCHEN_TOKEN`
 - `CORS_ALLOWED_ORIGINS`
 - `SEED_ADMIN_EMAIL`
 - `SEED_ADMIN_PASSWORD`
